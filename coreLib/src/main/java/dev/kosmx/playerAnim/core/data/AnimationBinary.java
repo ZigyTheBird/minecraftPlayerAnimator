@@ -184,9 +184,11 @@ public final class AnimationBinary {
             enabled = length >= 0;
         }
         for (int i = 0; i < length; i++) {
-
             int currentPos = buf.position();
-            if(! part.addKeyFrame(buf.getInt(), buf.getFloat(), Ease.getEase(buf.get()))){
+            int id = buf.getInt();
+            float value = buf.getFloat();
+            Ease ease = Ease.getEase(buf.get());
+            if(! part.addKeyFrame(id, value, ease)){
                 valid = false;
             }
             buf.position(currentPos + keyframeSize);

@@ -3,6 +3,9 @@ package dev.kosmx.playerAnim.core.util;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 public class Easing {
 
     /**
@@ -172,5 +175,30 @@ public class Easing {
 
     public static float inOutBounce(float x){
         return x < 0.5 ? (1 - outBounce(1 - 2 * x)) / 2 : (1 + outBounce(2 * x - 1)) / 2;
+    }
+
+    public static float easeOut(float t, float n, BiFunction<Float, Float, Float> function) {
+        return 1 - function.apply(1 - t, n);
+    }
+
+    public static float easeInOut(float t, float n, BiFunction<Float, Float, Float> function) {
+        if (t < 0.5d)
+            return (float) (function.apply((float) (t * 2d), n) / 2d);
+
+        return (float) (1 - function.apply((float) ((1 - t) * 2d), n) / 2d);
+    }
+
+    public static float bounce(float t, float n) {
+        return (float) Math.min(Math.min(121f / 16f * t * t, 121f / 4f * n * Math.pow(t - 6f / 11f, 2) + 1 - n),
+                Math.min(121 * n * n * Math.pow(t - 9f / 11f, 2) + 1 - n * n, 484 * n * n * n * Math.pow(t - 10.5f / 11f, 2) + 1 - n * n * n));
+    }
+
+    public static float elastic(float t, float n) {
+        return (float) (1 - Math.pow(Math.cos(t * Math.PI / 2f), 3) * Math.cos(t * n * Math.PI));
+    }
+
+    public static float back(float t, float n) {
+        final double n2 = n * 1.70158d;
+        return (float) (t * t * ((n2 + 1) * t - n2));
     }
 }

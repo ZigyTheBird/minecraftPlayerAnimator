@@ -49,6 +49,38 @@ public enum Ease {
         return impl.invoke(f);
     }
 
+    /**
+     * Run the easing
+     * @param t float between 0 and 1
+     * @param n float easing argument
+     * @return ease(t, n)
+     */
+    public float invoke(float t, Float n) {
+        if (n != null) {
+            switch (id) {
+                case 27:
+                    return Easing.back(t, n);
+                case 28:
+                    return Easing.easeOut(t, n, Easing::back);
+                case 29:
+                    return Easing.easeInOut(t, n, Easing::back);
+                case 30:
+                    return Easing.elastic(t, n);
+                case 31:
+                    return Easing.easeOut(t, n, Easing::elastic);
+                case 32:
+                    return Easing.easeInOut(t, n, Easing::elastic);
+                case 33:
+                    return Easing.bounce(t, n);
+                case 34:
+                    return Easing.easeOut(t, n, Easing::bounce);
+                case 35:
+                    return Easing.easeInOut(t, n, Easing::bounce);
+            }
+        }
+        return impl.invoke(t);
+    }
+
     //To be able to send these as bytes instead of String names.
     public static Ease getEase(byte b){
         for(Ease ease:Ease.values()){
