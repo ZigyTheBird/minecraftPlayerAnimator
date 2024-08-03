@@ -125,7 +125,7 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
             Float easingArg = null;
             try {
                 if (obj.has("easingArg")) {
-                    easingArg = easingArg.floatValue();
+                    easingArg = obj.get("easingArg").getAsFloat();
                 }
             }
             catch (NullPointerException ignore) {}
