@@ -106,6 +106,9 @@ public final class AnimationBinary {
                 buf.putInt(move.tick);
                 buf.putFloat(move.value);
                 buf.put(move.ease.getId());
+                if (version >= 3) {
+                    buf.putFloat(move.easingArg == null ? 0 : move.easingArg);
+                }
             }
         }
     }
@@ -188,7 +191,14 @@ public final class AnimationBinary {
             int id = buf.getInt();
             float value = buf.getFloat();
             Ease ease = Ease.getEase(buf.get());
-            if(! part.addKeyFrame(id, value, ease)){
+            Float easingArg = null;
+            if (version >= 3) {
+                easingArg = buf.getFloat();
+                if (easingArg == 0) {
+                    easingArg = null;
+                }
+            }
+            if(! part.addKeyFrame(id, value, ease, easingArg)){
                 valid = false;
             }
             buf.position(currentPos + keyframeSize);
@@ -202,7 +212,7 @@ public final class AnimationBinary {
      * @return version
      */
     public static int getCurrentVersion() {
-        return 2;
+        return 3;
     }
 
 

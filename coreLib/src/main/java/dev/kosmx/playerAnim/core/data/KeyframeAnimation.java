@@ -600,16 +600,22 @@ public final class KeyframeAnimation implements Supplier<UUID> {
             int result = tick;
             result = 31 * result + Float.hashCode(value);
             result = 31 * result + ease.getId();
+            result = 31 * result + (int)Math.floor((easingArg == null ? 0 : easingArg) * 100);
             return result;
         }
 
         @Override
         public String toString() {
-            return "KeyFrame{" +
+            String string = "KeyFrame{" +
                     "tick=" + tick +
                     ", value=" + value +
-                    ", ease=" + ease +
-                    '}';
+                    ", ease=" + ease;
+            if (easingArg != null) {
+                string += ", easingArg=";
+                string += easingArg;
+            }
+            string += '}';
+            return string;
         }
     }
 
