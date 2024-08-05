@@ -260,7 +260,7 @@ public final class AnimationBinary {
     }
 
     private static int axisSize(KeyframeAnimation.StateCollection.State axis, int version){
-        return axis.getKeyFrames().size()*keyframeSize + (version >= 2 ? 5 : 4);// count*IFB + I (for count)
+        return axis.getKeyFrames().size()*(version >= 3 ? keyframeSize + 4 : keyframeSize) + (version >= 2 ? 5 : 4);// count*IFB + I (for count)
     }
 
 
