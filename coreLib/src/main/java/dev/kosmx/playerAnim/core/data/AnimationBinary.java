@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -93,7 +94,7 @@ public final class AnimationBinary {
         }
     }
 
-    private static void writeKeyframes(ByteBuffer buf, KeyframeAnimation.StateCollection.State part, int version){
+    private static void writeKeyframes(ByteBuffer buf, KeyframeAnimation.StateCollection.State part, int version) {
         List<KeyframeAnimation.KeyFrame> list = part.getKeyFrames();
         if (version >= 2) {
             putBoolean(buf, part.isEnabled());
@@ -102,13 +103,26 @@ public final class AnimationBinary {
             buf.putInt(part.isEnabled() ? list.size() : -1);
         }
         if (part.isEnabled() || version >= 2) {
+            if (version >= 3) {
+                Map<Integer, Float> easingArgs = new HashMap<>();
+                for (int i = 0; i < list.size(); i++) {
+                    KeyframeAnimation.KeyFrame keyFrame = list.get(i);
+                    if (keyFrame.easingArg != null) {
+                        easingArgs.put(i, keyFrame.easingArg);
+                    }
+                }
+
+                buf.putInt(easingArgs.size());
+                for (Map.Entry<Integer, Float> entry : easingArgs.entrySet()) {
+                    buf.putInt(entry.getKey());
+                    buf.putFloat(entry.getValue());
+                }
+            }
+
             for (KeyframeAnimation.KeyFrame move : list) {
                 buf.putInt(move.tick);
                 buf.putFloat(move.value);
                 buf.put(move.ease.getId());
-                if (version >= 3) {
-                    buf.putFloat(move.easingArg == null ? 0 : move.easingArg);
-                }
             }
         }
     }
@@ -186,19 +200,23 @@ public final class AnimationBinary {
             length = buf.getInt();
             enabled = length >= 0;
         }
+
+        Map<Integer, Float> easingArgs = new HashMap<>();
+
+        if (version >= 3) {
+            int n = buf.getInt();
+            for (int i = 0; i < n; i++) {
+                easingArgs.put(buf.getInt(), buf.getFloat());
+            }
+        }
+
         for (int i = 0; i < length; i++) {
             int currentPos = buf.position();
-            int id = buf.getInt();
-            float value = buf.getFloat();
-            Ease ease = Ease.getEase(buf.get());
             Float easingArg = null;
-            if (version >= 3) {
-                easingArg = buf.getFloat();
-                if (easingArg == 0) {
-                    easingArg = null;
-                }
+            if (easingArgs.containsKey(i)) {
+                easingArg = easingArgs.get(i);
             }
-            if(! part.addKeyFrame(id, value, ease, easingArg)){
+            if(!part.addKeyFrame(buf.getInt(), buf.getFloat(), Ease.getEase(buf.get()), easingArg)){
                 valid = false;
             }
             buf.position(currentPos + keyframeSize);
@@ -260,7 +278,15 @@ public final class AnimationBinary {
     }
 
     private static int axisSize(KeyframeAnimation.StateCollection.State axis, int version){
-        return axis.getKeyFrames().size()*(version >= 3 ? keyframeSize + 4 : keyframeSize) + (version >= 2 ? 5 : 4);// count*IFB + I (for count)
+        int size = axis.getKeyFrames().size()*keyframeSize + (version >= 2 ? 5 : 4) + (version >= 3 ? 1 : 0);// count*IFB + I (for count)
+        if (version >= 3) {
+            for (KeyframeAnimation.KeyFrame keyFrame : axis.getKeyFrames()) {
+                if (keyFrame.easingArg != null) {
+                    size += 8;
+                }
+            }
+        }
+        return size;
     }
 
 
