@@ -17,8 +17,7 @@
     "client": ["dev.kosmx.playerAnim.fabric.client.FabricClientInitializer"]
   },
   "mixins": [
-    "playerAnimator-common.mixins.json",
-    "playerAnimator-xlpackets.mixins.json"
+    "playerAnimator-common.mixins.json"
   ],
   "depends": {
     "minecraft": ">=1.19",
