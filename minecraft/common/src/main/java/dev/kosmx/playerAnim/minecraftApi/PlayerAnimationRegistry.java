@@ -113,7 +113,22 @@ public final class PlayerAnimationRegistry {
                 }
             });
             for(var animation: a) {
-                animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), animation.getName()), animation);
+                animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), serializeTextToString(animation.getName())), animation);
+            }
+        }
+        for (var resource: manager.listResources("player_animation", ignore -> true).entrySet()) {
+            var extension = AnimationCodecs.getExtension(resource.getKey().getPath());
+            if (extension == null) continue;
+            logger.warn("Animation {} is in wrong directory: \"player_animation\", please place it in \"player_animations\".", resource.getKey().getPath());
+            var a = AnimationCodecs.deserialize(extension, () -> {
+                try {
+                    return resource.getValue().open();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            for(var animation: a) {
+                animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), serializeTextToString(animation.getName())), animation);
             }
         }
     }

@@ -1,7 +1,7 @@
 package dev.kosmx.playerAnim.minecraftApi.codec;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonParseException;
 import dev.kosmx.playerAnim.api.IPlayable;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +21,7 @@ public abstract class AbstractGsonCodec<T extends IPlayable> implements Animatio
         try {
             // type safety is off!
             return gson.fromJson(new InputStreamReader(buffer), getListedTypeToken());
-        } catch (JsonSyntaxException e) {
+        } catch (JsonParseException e) {
             throw new IOException(e);
         }
     }

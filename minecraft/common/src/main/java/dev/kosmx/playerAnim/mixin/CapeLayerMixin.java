@@ -1,15 +1,14 @@
 package dev.kosmx.playerAnim.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import dev.kosmx.playerAnim.api.TransformType;
-import dev.kosmx.playerAnim.core.util.MathHelper;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.layers.CapeLayer;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,8 +22,8 @@ public class CapeLayerMixin {
         Vec3f pos = emote.get3DTransform("torso", TransformType.POSITION, Vec3f.ZERO);
         poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
         Vec3f rot = emote.get3DTransform("torso", TransformType.ROTATION, Vec3f.ZERO);
-        poseStack.mulPose(Vector3f.ZP.rotation(rot.getZ()));    //roll
-        poseStack.mulPose(Vector3f.YP.rotation(rot.getY()));    //pitch
-        poseStack.mulPose(Vector3f.XP.rotation(rot.getX()));    //yaw
+        poseStack.mulPose(Axis.ZP.rotation(rot.getZ()));    //roll
+        poseStack.mulPose(Axis.YP.rotation(rot.getY()));    //pitch
+        poseStack.mulPose(Axis.XP.rotation(rot.getX()));    //yaw
     }
 }
