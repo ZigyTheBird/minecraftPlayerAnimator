@@ -15,7 +15,7 @@ import java.util.List;
  * <p>
  * Use {@link AnimationSerializing#deserializeAnimation(Reader)} to deserialize<br>
  * or {@link AnimationSerializing#serializeAnimation(KeyframeAnimation)} to serialize.
- * @deprecated use {@link AnimationCodec instead}
+ * @deprecated use AnimationCodec instead
  */
 @Deprecated(forRemoval = true)
 public class AnimationSerializing {
