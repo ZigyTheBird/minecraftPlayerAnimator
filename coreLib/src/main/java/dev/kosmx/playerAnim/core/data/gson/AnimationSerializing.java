@@ -1,7 +1,5 @@
 package dev.kosmx.playerAnim.core.data.gson;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 
 import java.io.*;
@@ -15,24 +13,29 @@ import java.util.List;
  * <p>
  * Use {@link AnimationSerializing#deserializeAnimation(Reader)} to deserialize<br>
  * or {@link AnimationSerializing#serializeAnimation(KeyframeAnimation)} to serialize.
- * @deprecated use AnimationCodec instead
+ * @deprecated use AnimationCodecs instead
  */
 @Deprecated(forRemoval = true)
 public class AnimationSerializing {
 
-
     /**
      * Deserialize animations from Emotecraft or GeckoLib InputStreamReader
+     * AnimatinCodecs#serialize()
      * @param stream inputStreamReader
      * @return List of animations
      */
     @Deprecated(forRemoval = true)
     public static List<KeyframeAnimation> deserializeAnimation(Reader stream) {
-        return AnimationJson.GSON.fromJson(stream, AnimationJson.getListedTypeToken());
+        try {
+            return AnimationJson.GSON.fromJson(stream, AnimationJson.getListedTypeToken());
+        } catch (Exception e) {
+            return GeckoLibSerializer.GSON.fromJson(stream, GeckoLibSerializer.getListedTypeToken());
+        }
     }
 
     /**
      * Deserialize animations from Emotecraft or GeckoLib InputStream
+     * use AnimatinCodecs#serialize()
      * @param stream inputStream
      * @return List of animations
      */

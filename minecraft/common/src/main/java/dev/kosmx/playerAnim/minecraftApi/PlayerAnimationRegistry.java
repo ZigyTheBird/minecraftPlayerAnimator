@@ -119,7 +119,7 @@ public final class PlayerAnimationRegistry {
         for (var resource: manager.listResources("player_animation", ignore -> true).entrySet()) {
             var extension = AnimationCodecs.getExtension(resource.getKey().getPath());
             if (extension == null) continue;
-            logger.warn("Animation {} is in wrong directory: \"player_animation\", please place it in \"player_animations\".", resource.getKey().getPath());
+            logger.warn("[WARNING FOR MOD DEVS] Animation {} is in wrong directory: \"player_animation\", please place it in \"player_animations\".", resource.getKey().getPath());
             var a = AnimationCodecs.deserialize(extension, () -> {
                 try {
                     return resource.getValue().open();
