@@ -20,7 +20,7 @@ public class CapeLayerMixin {
     private void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, AbstractClientPlayer abstractClientPlayer, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
         AnimationApplier emote = ((IAnimatedPlayer) abstractClientPlayer).playerAnimator_getAnimation();
         Vec3f pos = emote.get3DTransform("torso", TransformType.POSITION, Vec3f.ZERO);
-        poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
+        poseStack.translate(pos.getX()/16, pos.getY()/16, pos.getZ()/16);
         Vec3f rot = emote.get3DTransform("torso", TransformType.ROTATION, Vec3f.ZERO);
         poseStack.mulPose(Axis.ZP.rotation(rot.getZ()));    //roll
         poseStack.mulPose(Axis.YP.rotation(rot.getY()));    //pitch
