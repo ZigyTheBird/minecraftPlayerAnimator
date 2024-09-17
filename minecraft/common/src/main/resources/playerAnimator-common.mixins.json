@@ -8,8 +8,10 @@
     "ArmorFeatureRendererMixin",
     "BipedEntityModelMixin",
     "CapeLayerMixin",
+    "ClientPlayerEntityMixin",
     "FeatureRendererMixin",
     "HeldItemMixin",
+    "ItemMixin",
     "LivingEntityRenderRedirect_bendOnly",
     "ModelPartMixin",
     "PlayerEntityMixin",
@@ -21,8 +23,7 @@
     "firstPerson.LevelRendererMixin",
     "firstPerson.LivingEntityRendererMixin"
   ],
-  "mixins": [
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   }

@@ -61,6 +61,7 @@ dependencies {
 
     modImplementation fabricApi.module("fabric-resource-loader-v0", project.fabric_api_version)
 
+    modRuntimeOnly "me.djtheredstoner:DevAuth-fabric:1.2.0"
 }
 
 project.archivesBaseName = rootProject.archives_base_name + "-" + project.name
