@@ -107,10 +107,7 @@ public final class AnimationBinary {
                 buf.putFloat(move.value);
                 buf.put(move.ease.getId());
                 if (version >= 4) {
-                    putBoolean(buf, move.easingArg != null);
-                    if (move.easingArg != null) {
-                        buf.putFloat(move.easingArg);
-                    }
+                    buf.putFloat(move.easingArg != null ? move.easingArg : Float.NaN);
                 }
             }
         }
@@ -200,12 +197,17 @@ public final class AnimationBinary {
             int tick = buf.getInt();
             float value = buf.getFloat();
             Ease ease = Ease.getEase(buf.get());
+            Float easingArg = null;
 
-            if (version >= 4 && getBoolean(buf)) {
-                if (!part.addKeyFrame(tick, value, ease, buf.getFloat())) {
-                    valid = false;
+            if (version >= 4) {
+                easingArg = buf.getFloat();
+
+                if (Float.isNaN(easingArg)) {
+                    easingArg = null;
                 }
-            } else if (!part.addKeyFrame(tick, value, ease)) {
+            }
+
+            if (!part.addKeyFrame(tick, value, ease, easingArg)) {
                 valid = false;
             }
             buf.position(currentPos + keyframeSize);
@@ -279,7 +281,7 @@ public final class AnimationBinary {
      * Size needed for one keyframe
      */
     private static byte keyframeSize(int version) {
-        return version < 4 ? (byte) 9 : (byte) 10; // 4 (I) + 4 (F) + 1 (B) ((+ 1) - arg)
+        return version < 4 ? (byte) 9 /* 4 (int) + 4 (float) + 1 (byte) */ : (byte) 13; /* + 4 (float) */
     }
 
     /**
