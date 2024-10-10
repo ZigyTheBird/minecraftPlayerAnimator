@@ -19,12 +19,6 @@ import java.util.UUID;
  */
 @SuppressWarnings("unused")
 public final class AnimationBinary {
-
-    /**
-     * Size needed for one keyframe
-     */
-    private static final byte keyframeSize = 9;
-
     /**
      * Write the animation into the ByteBuffer.
      * Versioning:
@@ -47,7 +41,7 @@ public final class AnimationBinary {
         buf.putInt(animation.returnToTick);
         putBoolean(buf, animation.isEasingBefore);
         putBoolean(buf, animation.nsfw);
-        buf.put(keyframeSize);
+        buf.put(keyframeSize(version));
         if (version >= 2) {
             buf.putInt(animation.getBodyParts().size());
             for (Map.Entry<String, KeyframeAnimation.StateCollection> part : animation.getBodyParts().entrySet()) {
@@ -108,26 +102,16 @@ public final class AnimationBinary {
             buf.putInt(part.isEnabled() ? list.size() : -1);
         }
         if (part.isEnabled() || version >= 2) {
-            if (version >= 3) {
-                Map<Integer, Float> easingArgs = new HashMap<>();
-                for (int i = 0; i < list.size(); i++) {
-                    KeyframeAnimation.KeyFrame keyFrame = list.get(i);
-                    if (keyFrame.easingArg != null) {
-                        easingArgs.put(i, keyFrame.easingArg);
-                    }
-                }
-
-                buf.putInt(easingArgs.size());
-                for (Map.Entry<Integer, Float> entry : easingArgs.entrySet()) {
-                    buf.putInt(entry.getKey());
-                    buf.putFloat(entry.getValue());
-                }
-            }
-
             for (KeyframeAnimation.KeyFrame move : list) {
                 buf.putInt(move.tick);
                 buf.putFloat(move.value);
                 buf.put(move.ease.getId());
+                if (version >= 4) {
+                    putBoolean(buf, move.easingArg != null);
+                    if (move.easingArg != null) {
+                        buf.putFloat(move.easingArg);
+                    }
+                }
             }
         }
     }
@@ -210,23 +194,18 @@ public final class AnimationBinary {
             length = buf.getInt();
             enabled = length >= 0;
         }
-
-        Map<Integer, Float> easingArgs = new HashMap<>();
-
-        if (version >= 3) {
-            int n = buf.getInt();
-            for (int i = 0; i < n; i++) {
-                easingArgs.put(buf.getInt(), buf.getFloat());
-            }
-        }
-
         for (int i = 0; i < length; i++) {
             int currentPos = buf.position();
-            Float easingArg = null;
-            if (easingArgs.containsKey(i)) {
-                easingArg = easingArgs.get(i);
-            }
-            if(!part.addKeyFrame(buf.getInt(), buf.getFloat(), Ease.getEase(buf.get()), easingArg)){
+
+            int tick = buf.getInt();
+            float value = buf.getFloat();
+            Ease ease = Ease.getEase(buf.get());
+
+            if (version >= 4 && getBoolean(buf)) {
+                if (!part.addKeyFrame(tick, value, ease, buf.getFloat())) {
+                    valid = false;
+                }
+            } else if (!part.addKeyFrame(tick, value, ease)) {
                 valid = false;
             }
             buf.position(currentPos + keyframeSize);
@@ -240,7 +219,7 @@ public final class AnimationBinary {
      * @return version
      */
     public static int getCurrentVersion() {
-        return 3;
+        return 4;
     }
 
 
@@ -293,17 +272,15 @@ public final class AnimationBinary {
     }
 
     private static int axisSize(KeyframeAnimation.StateCollection.State axis, int version){
-        int size = axis.getKeyFrames().size()*keyframeSize + (version >= 2 ? 5 : 4) + (version >= 3 ? 1 : 0);// count*IFB + I (for count)
-        if (version >= 3) {
-            for (KeyframeAnimation.KeyFrame keyFrame : axis.getKeyFrames()) {
-                if (keyFrame.easingArg != null) {
-                    size += 8;
-                }
-            }
-        }
-        return size;
+        return axis.getKeyFrames().size()*keyframeSize(version) + (version >= 2 ? 5 : 4);// count*IFB + I (for count)
     }
 
+    /**
+     * Size needed for one keyframe
+     */
+    private static byte keyframeSize(int version) {
+        return version < 4 ? (byte) 9 : (byte) 10; // 4 (I) + 4 (F) + 1 (B) ((+ 1) - arg)
+    }
 
     /**
      * Writes a bool value into byteBuffer, using 1 byte per bool
