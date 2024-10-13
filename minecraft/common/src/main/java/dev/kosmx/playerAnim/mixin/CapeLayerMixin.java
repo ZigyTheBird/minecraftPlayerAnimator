@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import dev.kosmx.playerAnim.core.util.Pair;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import net.minecraft.client.model.PlayerModel;
@@ -31,11 +32,17 @@ public abstract class CapeLayerMixin extends RenderLayer<AbstractClientPlayer, P
         AnimationApplier emote = ((IAnimatedPlayer) abstractClientPlayer).playerAnimator_getAnimation();
         if (emote.isActive()) {
             ModelPart torso = this.getParentModel().body;
+            Pair<Float, Float> bend = emote.getBend("torso");
 
-            poseStack.rotateAround((new Quaternionf()).rotateXYZ(torso.xRot, torso.yRot, torso.zRot), torso.x/16, torso.y/16, torso.z/16);
+            poseStack.rotateAround((new Quaternionf()).rotateXYZ(torso.xRot, torso.yRot + bend.getLeft(), torso.zRot), torso.x/16, torso.y/16, torso.z/16);
 
             poseStack.translate(0.0F, 0.0F, 0.125F);
             poseStack.translate(torso.x / 16, torso.y / 16, torso.z / 16);
+            if (bend.getRight() != 0) {
+                poseStack.translate(0, 0.375F * torso.yScale, 0);
+                poseStack.mulPose(Axis.XP.rotation(bend.getRight()));
+                poseStack.translate(0, -0.375F * torso.yScale, 0);
+            }
 
             double d = Mth.lerp(h, abstractClientPlayer.xCloakO, abstractClientPlayer.xCloak)
                     - Mth.lerp(h, abstractClientPlayer.xo, abstractClientPlayer.getX());
@@ -48,8 +55,12 @@ public abstract class CapeLayerMixin extends RenderLayer<AbstractClientPlayer, P
             s = Mth.clamp(s, -20.0F, 20.0F);
 
             poseStack.mulPose(Axis.XP.rotationDegrees(6.0F / 2.0F));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(s / 2.0F));
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - s / 2.0F));
+
+            ModelPart cape = ((PlayerModelAccessor)this.getParentModel()).getCloak();
+            cape.x = 0;
+            cape.y = 0;
+            cape.z = 0;
         }
     }
 
