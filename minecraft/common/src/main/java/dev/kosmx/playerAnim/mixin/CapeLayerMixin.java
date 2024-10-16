@@ -34,15 +34,14 @@ public abstract class CapeLayerMixin extends RenderLayer<AbstractClientPlayer, P
             ModelPart torso = this.getParentModel().body;
             Pair<Float, Float> bend = emote.getBend("torso");
 
-            poseStack.rotateAround((new Quaternionf()).rotateXYZ(torso.xRot, torso.yRot + bend.getLeft(), torso.zRot), torso.x/16, torso.y/16, torso.z/16);
-
-            poseStack.translate(0.0F, 0.0F, 0.125F);
             poseStack.translate(torso.x / 16, torso.y / 16, torso.z / 16);
+            poseStack.mulPose((new Quaternionf()).rotateXYZ(torso.xRot, torso.yRot, torso.zRot));
             if (bend.getRight() != 0) {
                 poseStack.translate(0, 0.375F * torso.yScale, 0);
                 poseStack.mulPose(Axis.XP.rotation(bend.getRight()));
                 poseStack.translate(0, -0.375F * torso.yScale, 0);
             }
+            poseStack.translate(0.0F, 0.0F, 0.125F);
 
             double d = Mth.lerp(h, abstractClientPlayer.xCloakO, abstractClientPlayer.xCloak)
                     - Mth.lerp(h, abstractClientPlayer.xo, abstractClientPlayer.getX());
