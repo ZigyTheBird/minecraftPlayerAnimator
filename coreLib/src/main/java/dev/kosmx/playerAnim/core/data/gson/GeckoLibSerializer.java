@@ -144,8 +144,7 @@ public class GeckoLibSerializer {
         Ease ease = Ease.LINEAR;
         Float easingArg = null;
         if (currentNode.has("lerp_mode")) {
-            String lerp = currentNode.get("lerp_mode").getAsString();
-            ease = lerp.equals("catmullrom") ? Ease.INOUTSINE : Easing.easeFromString(lerp); //IDK what am I doing
+            ease = Easing.easeFromString(currentNode.get("lerp_mode").getAsString());
         }
         KeyframeAnimation.StateCollection.State[] targetVec = getTargetVec(stateCollection, type);
         if (currentNode.has("easing")) ease = Easing.easeFromString(currentNode.get("easing").getAsString());
