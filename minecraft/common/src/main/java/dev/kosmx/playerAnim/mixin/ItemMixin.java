@@ -2,7 +2,9 @@ package dev.kosmx.playerAnim.mixin;
 
 import dev.kosmx.playerAnim.IExampleAnimatedPlayer;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
+import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
+import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -30,9 +32,42 @@ public class ItemMixin {
                 var animationContainer = ((IExampleAnimatedPlayer) player).modid_getModAnimation();
 
                 //Use setAnimation to set the current animation. It will be played automatically.
-                KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "animation"));
+                KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "sneak_idle"));
 
-                animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
+                animationContainer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(5, Ease.INOUTSINE), new KeyframeAnimationPlayer(anim));
+
+                //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
+            }
+            if (itemStack.getItem().equals(Items.BLUE_ICE)) {
+                //If we want to play the animation, get the animation container
+                var animationContainer = ((IExampleAnimatedPlayer) player).modid_getModAnimation();
+
+                //Use setAnimation to set the current animation. It will be played automatically.
+                KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "ice_run"));
+
+                animationContainer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(5, Ease.INOUTSINE), new KeyframeAnimationPlayer(anim));
+
+                //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
+            }
+            if (itemStack.getItem().equals(Items.QUARTZ)) {
+                //If we want to play the animation, get the animation container
+                var animationContainer = ((IExampleAnimatedPlayer) player).modid_getModAnimation();
+
+                //Use setAnimation to set the current animation. It will be played automatically.
+                KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "on_fence_idle_animation"));
+
+                animationContainer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(5, Ease.INOUTSINE), new KeyframeAnimationPlayer(anim));
+
+                //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
+            }
+            if (itemStack.getItem().equals(Items.GOLD_INGOT)) {
+                //If we want to play the animation, get the animation container
+                var animationContainer = ((IExampleAnimatedPlayer) player).modid_getModAnimation();
+
+                //Use setAnimation to set the current animation. It will be played automatically.
+                KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "shield_animation"));
+
+                animationContainer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(5, Ease.INOUTSINE), new KeyframeAnimationPlayer(anim));
 
                 //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
             }

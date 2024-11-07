@@ -174,8 +174,7 @@ public class GeckoLibSerializer implements JsonDeserializer<List<KeyframeAnimati
     private static void readDataAtTick(JsonObject currentNode, KeyframeAnimation.StateCollection stateCollection, int tick, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
         Ease ease = Ease.LINEAR;
         if (currentNode.has("lerp_mode")) {
-            String lerp = currentNode.get("lerp_mode").getAsString();
-            ease = lerp.equals("catmullrom") ? Ease.INOUTSINE : Easing.easeFromString(lerp); //IDK what am I doing
+            ease = Easing.easeFromString(currentNode.get("lerp_mode").getAsString());
         }
         KeyframeAnimation.StateCollection.State[] targetVec = getTargetVec(stateCollection, type);
         if (currentNode.has("easing")) ease = Easing.easeFromString(currentNode.get("easing").getAsString());

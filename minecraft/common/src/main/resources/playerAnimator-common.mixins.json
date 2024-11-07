@@ -23,7 +23,9 @@
     "firstPerson.LevelRendererMixin",
     "firstPerson.LivingEntityRendererMixin"
   ],
-  "mixins": [],
+  "mixins": [
+    "PlayerModelAccessor"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
