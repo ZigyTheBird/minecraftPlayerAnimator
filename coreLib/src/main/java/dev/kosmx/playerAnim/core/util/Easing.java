@@ -129,8 +129,4 @@ public class Easing {
                 + (2.0f * n - 5.0f * (n + 1) + 4.0f * (n + 2) - (n + 3)) * 1
                 + (3.0f * (n + 1) - n - 3.0f * (n + 2) + (n + 3)) * 1));
     }
-
-    public static float bezier(float n) {
-        return quadratic(n); // TODO implement, quad for now
-    }
 }

@@ -62,11 +62,6 @@ public enum Ease {
     OUTBOUNCE(34, arg -> easeOut(Easing.bounce(arg))),
     INOUTBOUNCE(35, arg -> easeInOut(Easing.bounce(arg))),
 
-    // Bezier
-    INBEZIER(36, arg -> easeIn(Easing::bezier)),
-    OUTBEZIER(37, arg -> easeOut(Easing::bezier)),
-    INOUTBEZIER(38, arg -> easeInOut(Easing::bezier)),
-
     CATMULLROM(39, arg -> easeInOut(Easing::catmullRom));
 
     @Getter
