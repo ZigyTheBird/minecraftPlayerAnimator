@@ -27,7 +27,6 @@ public class Easing {
      */
     public static Ease easeFromString(String string){
         try{
-            if(string.equals("step"))return Ease.CONSTANT;
             if(string.substring(0, 4).equalsIgnoreCase("EASE")){
                 string = string.substring(4);
             }

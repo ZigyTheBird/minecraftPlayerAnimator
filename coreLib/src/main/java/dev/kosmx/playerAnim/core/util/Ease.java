@@ -10,7 +10,7 @@ import java.util.function.Function;
  */
 public enum Ease {
     LINEAR(0, arg -> easeIn(f -> f)),
-    CONSTANT(1, arg -> easeIn(Easing.step(arg))),
+    CONSTANT(1, arg -> easeIn(f -> 0f)),
 
     // Sine
     INSINE(6, arg -> easeIn(Easing::sine)),
@@ -62,7 +62,8 @@ public enum Ease {
     OUTBOUNCE(34, arg -> easeOut(Easing.bounce(arg))),
     INOUTBOUNCE(35, arg -> easeInOut(Easing.bounce(arg))),
 
-    CATMULLROM(39, arg -> easeInOut(Easing::catmullRom));
+    CATMULLROM(36, arg -> easeInOut(Easing::catmullRom)),
+    STEP(37, arg -> easeIn(Easing.step(arg)));
 
     @Getter
     final byte id;
