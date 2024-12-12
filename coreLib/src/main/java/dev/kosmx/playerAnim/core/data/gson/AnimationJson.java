@@ -51,7 +51,7 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         JsonObject node = json.getAsJsonObject();
 
         if(!node.has("emote")){
-            throw new JsonParseException("not an emotecraft animation");
+            return GeckoLibSerializer.deserialize(node); // TODO remove
         }
 
         int version = 1;
