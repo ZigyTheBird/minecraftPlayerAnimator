@@ -71,12 +71,34 @@ public class ItemMixin {
 
                 //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
             }
-            if (itemStack.getItem().equals(Items.NETHERITE_BLOCK)) {
+            if (itemStack.getItem().equals(Items.CHISELED_QUARTZ_BLOCK)) {
                 //If we want to play the animation, get the animation container
                 var animationContainer = ((IExampleAnimatedPlayer) player).modid_getModAnimation();
 
                 //Use setAnimation to set the current animation. It will be played automatically.
                 KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "ftykfykftk"));
+
+                animationContainer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(5, Ease.INOUTSINE), new KeyframeAnimationPlayer(anim));
+
+                //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
+            }
+            if (itemStack.getItem().equals(Items.NETHERITE_BLOCK)) {
+                //If we want to play the animation, get the animation container
+                var animationContainer = ((IExampleAnimatedPlayer) player).modid_getModAnimation();
+
+                //Use setAnimation to set the current animation. It will be played automatically.
+                KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "testaeedxsa"));
+
+                animationContainer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(5, Ease.INOUTSINE), new KeyframeAnimationPlayer(anim));
+
+                //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
+            }
+            if (itemStack.getItem().equals(Items.BEACON)) {
+                //If we want to play the animation, get the animation container
+                var animationContainer = ((IExampleAnimatedPlayer) player).modid_getModAnimation();
+
+                //Use setAnimation to set the current animation. It will be played automatically.
+                KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "namewdwaawd"));
 
                 animationContainer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(5, Ease.INOUTSINE), new KeyframeAnimationPlayer(anim));
 
