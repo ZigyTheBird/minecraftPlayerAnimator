@@ -15,16 +15,15 @@
     "LivingEntityRenderRedirect_bendOnly",
     "ModelPartMixin",
     "PlayerEntityMixin",
+    "PlayerModelAccessor",
     "PlayerModelMixin",
     "PlayerRendererMixin",
+    "PlayerRenderStateMixin",
     "firstPerson.CameraAccessor",
     "firstPerson.EntityRenderDispatcherMixin",
     "firstPerson.ItemInHandRendererMixin",
     "firstPerson.LevelRendererMixin",
     "firstPerson.LivingEntityRendererMixin"
-  ],
-  "mixins": [
-    "PlayerModelAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

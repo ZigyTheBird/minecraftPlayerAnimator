@@ -16,7 +16,7 @@ public class FeatureRendererMixin implements IUpperPartHelper {
 
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(RenderLayerParent renderLayerParent, CallbackInfo ci) {
+    private void init(RenderLayerParent<?, ?> renderLayerParent, CallbackInfo ci) {
         if (this.getClass().getPackageName().contains("skinlayers") && !this.getClass().getSimpleName().toLowerCase().contains("head")) {
             isUpperPart = false;
         }
