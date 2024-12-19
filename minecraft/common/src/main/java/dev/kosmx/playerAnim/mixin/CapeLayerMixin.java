@@ -4,9 +4,9 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import dev.kosmx.playerAnim.core.util.Pair;
 import dev.kosmx.playerAnim.impl.IPlayerForwarder;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
+import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -34,26 +34,22 @@ public abstract class CapeLayerMixin extends RenderLayer<PlayerRenderState, Play
     @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/state/PlayerRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/HumanoidModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;II)V"))
     private void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, PlayerRenderState playerRenderState, float f, float g, CallbackInfo ci) {
         AnimationApplier emote = IPlayerForwarder.getApplier(playerRenderState);
-        if (emote != null && emote.isActive()) {
+        if (emote.isActive()) {
             ModelPart torso = this.getParentModel().body;
-            Pair<Float, Float> bend = emote.getBend("torso");
 
             poseStack.translate(torso.x / 16, torso.y / 16, torso.z / 16);
             poseStack.mulPose((new Quaternionf()).rotateXYZ(torso.xRot, torso.yRot, torso.zRot));
-            if (bend.getRight() != 0) {
-                poseStack.translate(0, 0.375F * torso.yScale, 0);
-                poseStack.mulPose(Axis.XP.rotation(bend.getRight()));
-                poseStack.translate(0, -0.375F * torso.yScale, 0);
-            }
+            IBendHelper.rotateMatrixStack(poseStack, emote.getBend("torso"));
             poseStack.translate(0.0F, 0.0F, 0.125F);
+            poseStack.mulPose(Axis.YP.rotationDegrees(180));
 
-            poseStack.mulPose(Axis.XP.rotationDegrees(6.0F / 2.0F));
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - playerRenderState.capeLean2 / 2.0F));
-
-            ModelPart cape = ((PlayerModelAccessor)this.model).getCape();
+            ModelPart cape = ((PlayerModelAccessor)this.getParentModel()).getCape();
             cape.x = 0;
             cape.y = 0;
             cape.z = 0;
+            cape.xRot = 0;
+            cape.yRot = 0;
+            cape.zRot = 0;
         }
     }
 
