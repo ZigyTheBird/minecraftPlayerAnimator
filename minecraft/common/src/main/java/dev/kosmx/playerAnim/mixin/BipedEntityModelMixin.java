@@ -8,13 +8,15 @@ import dev.kosmx.playerAnim.impl.Helper;
 import dev.kosmx.playerAnim.impl.IMutableModel;
 import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import dev.kosmx.playerAnim.impl.IUpperPartHelper;
-import net.minecraft.client.model.AgeableListModel;
+import net.minecraft.client.model.ArmedModel;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.function.Function;
 
 @Mixin(HumanoidModel.class)
-public abstract class BipedEntityModelMixin<T extends LivingEntity> extends AgeableListModel<T> implements IMutableModel {
+public abstract class BipedEntityModelMixin<T extends HumanoidRenderState> extends EntityModel<T> implements ArmedModel, HeadedModel, IMutableModel {
     @Final
     @Shadow
     public ModelPart rightArm;
@@ -32,6 +34,10 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> extends Agea
     public ModelPart leftArm;
     @Unique
     private SetableSupplier<AnimationProcessor> animation = new SetableSupplier<>();
+
+    protected BipedEntityModelMixin(ModelPart modelPart) {
+        super(modelPart);
+    }
 
     @Inject(method = "<init>(Lnet/minecraft/client/model/geom/ModelPart;Ljava/util/function/Function;)V", at = @At("RETURN"))
     private void initBend(ModelPart modelPart, Function<ResourceLocation, RenderType> function, CallbackInfo ci){
@@ -62,12 +68,12 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> extends Agea
     @Override
     public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color){
         if(Helper.isBendEnabled() && this.animation.get() != null && this.animation.get().isActive()){
-            this.headParts().forEach((part)->{
+            this.head.getAllParts().forEach((part)->{
                 if(! ((IUpperPartHelper) part).isUpperPart()){
                     part.render(matrices, vertices, light, overlay, color);
                 }
             });
-            this.bodyParts().forEach((part)->{
+            this.body.getAllParts().forEach((part)->{
                 if(! ((IUpperPartHelper) part).isUpperPart()){
                     part.render(matrices, vertices, light, overlay, color);
                 }
@@ -76,12 +82,12 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> extends Agea
             SetableSupplier<AnimationProcessor> emoteSupplier = this.animation;
             matrices.pushPose();
             IBendHelper.rotateMatrixStack(matrices, emoteSupplier.get().getBend("body"));
-            this.headParts().forEach((part)->{
+            this.head.getAllParts().forEach((part)->{
                 if(((IUpperPartHelper) part).isUpperPart()){
                     part.render(matrices, vertices, light, overlay, color);
                 }
             });
-            this.bodyParts().forEach((part)->{
+            this.body.getAllParts().forEach((part)->{
                 if(((IUpperPartHelper) part).isUpperPart()){
                     part.render(matrices, vertices, light, overlay, color);
                 }
