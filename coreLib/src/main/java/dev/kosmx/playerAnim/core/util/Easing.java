@@ -27,7 +27,6 @@ public class Easing {
      */
     public static Ease easeFromString(String string){
         try{
-            if(string.equals("step"))return Ease.CONSTANT;
             if(string.substring(0, 4).equalsIgnoreCase("EASE")){
                 string = string.substring(4);
             }
@@ -128,9 +127,5 @@ public class Easing {
         return (0.5f * (2.0f * (n + 1) + ((n + 2) - n) * 1
                 + (2.0f * n - 5.0f * (n + 1) + 4.0f * (n + 2) - (n + 3)) * 1
                 + (3.0f * (n + 1) - n - 3.0f * (n + 2) + (n + 3)) * 1));
-    }
-
-    public static float bezier(float n) {
-        return quadratic(n); // TODO implement, quad for now
     }
 }
