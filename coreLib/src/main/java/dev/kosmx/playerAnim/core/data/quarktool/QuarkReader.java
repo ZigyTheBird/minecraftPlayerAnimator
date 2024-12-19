@@ -1,7 +1,7 @@
 package dev.kosmx.playerAnim.core.data.quarktool;
 
-import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.data.AnimationFormat;
+import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;

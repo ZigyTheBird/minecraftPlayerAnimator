@@ -7,9 +7,9 @@ import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.core.data.opennbs.NBS;
 import dev.kosmx.playerAnim.core.util.Ease;
 import lombok.Getter;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import javax.annotation.concurrent.Immutable;
 import java.nio.ByteBuffer;
 import java.util.*;

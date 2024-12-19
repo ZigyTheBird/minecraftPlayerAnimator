@@ -7,7 +7,6 @@ import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Easing;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,11 +158,11 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         addPartIfExists(part.pitch, "pitch", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.yaw, "yaw", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.roll, "roll", partNode, degrees, tick, easing, turn);
-        addPartIfExists(part.bend, "bend", partNode, degrees, tick, easing, turn);
-        addPartIfExists(part.bendDirection, "axis", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.scaleX, "scaleX", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.scaleY, "scaleY", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.scaleZ, "scaleZ", partNode, degrees, tick, easing, turn);
+        addPartIfExists(part.bend, "bend", partNode, degrees, tick, easing, turn);
+        addPartIfExists(part.bendDirection, "axis", partNode, degrees, tick, easing, turn);
     }
 
     private void addPartIfExists(KeyframeAnimation.StateCollection.State part, String name, JsonObject node, boolean degrees, int tick, String easing, int turn){
