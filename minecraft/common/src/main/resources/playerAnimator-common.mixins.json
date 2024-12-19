@@ -15,14 +15,12 @@
     "PlayerEntityMixin",
     "PlayerModelMixin",
     "PlayerRendererMixin",
+    "PlayerModelAccessor",
     "firstPerson.CameraAccessor",
     "firstPerson.EntityRenderDispatcherMixin",
     "firstPerson.ItemInHandRendererMixin",
     "firstPerson.LevelRendererMixin",
     "firstPerson.LivingEntityRendererMixin"
-  ],
-  "mixins": [
-    "PlayerModelAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
