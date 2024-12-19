@@ -5,7 +5,9 @@ import com.google.gson.JsonParseException;
 import dev.kosmx.playerAnim.api.IPlayable;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.Collection;
 

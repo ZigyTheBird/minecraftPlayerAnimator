@@ -39,6 +39,7 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<T> i
     public ModelPart leftSleeve;
     @Shadow @Final public ModelPart rightPants;
     @Shadow @Final public ModelPart leftPants;
+    @Shadow @Final private ModelPart cloak;
     @Unique
     private final SetableSupplier<AnimationProcessor> emoteSupplier = new SetableSupplier<>();
 
@@ -61,10 +62,10 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<T> i
         addBendMutator(this.rightSleeve, Direction.UP);
         addBendMutator(this.leftPants, Direction.UP);
         addBendMutator(this.leftSleeve, Direction.UP);
+        IBendHelper.INSTANCE.initCapeBend(this.cloak);
 
         ((IUpperPartHelper)rightSleeve).setUpperPart(true);
         ((IUpperPartHelper)leftSleeve).setUpperPart(true);
-
     }
 
     @Unique
@@ -133,8 +134,6 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<T> i
             emote.updatePart("leftLeg", this.leftLeg);
             emote.updatePart("rightLeg", this.rightLeg);
             emote.updatePart("torso", this.body);
-
-
         }
         else {
             firstPersonNext = false;

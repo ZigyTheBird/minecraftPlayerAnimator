@@ -1,7 +1,6 @@
 package dev.kosmx.playerAnim.minecraftApi.codec;
 
 import dev.kosmx.playerAnim.api.IPlayable;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

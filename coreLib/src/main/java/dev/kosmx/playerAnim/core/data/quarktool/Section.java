@@ -2,8 +2,8 @@ package dev.kosmx.playerAnim.core.data.quarktool;
 
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Easing;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
