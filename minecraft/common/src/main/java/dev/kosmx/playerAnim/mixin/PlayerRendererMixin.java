@@ -79,7 +79,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         if (animationPlayer == null) {
             return;
         }
-        animationPlayer.setTickDelta(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true));
+        //animationPlayer.setTickDelta(tickDelta); TODO
         if(animationPlayer.isActive()){
 
             //These are additive properties
@@ -97,12 +97,12 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         }
     }
 
-    @Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/ModelPart;resetPose()V"))
+    /*@Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/ModelPart;resetPose()V"))
     private void notifyModelOfFirstPerson(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl, CallbackInfo ci) {
-        if (this.getModel() instanceof IPlayerModel playerModel) {
-            playerModel.playerAnimator_prepForFirstPersonRender();
+        if (this.getModel() instanceof IPlayerModel playerModel && !((IAnimatedPlayer)abstractClientPlayer).playerAnimator_getAnimation().getFirstPersonMode().isEnabled()) {
+            playerModel.playerAnimator_prepForFirstPersonRender(); TODO
         }
-    }
+    }*/
 
     @Inject(
             method = "extractRenderState(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;F)V",
