@@ -5,12 +5,14 @@ import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
 import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
 import dev.kosmx.playerAnim.api.layered.modifier.AbstractModifier;
+import dev.kosmx.playerAnim.api.layered.modifier.FirstPersonModifier;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import lombok.Getter;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -80,6 +82,7 @@ public class ModifierLayer<T extends IAnimation> implements IAnimation {
     /**
      * Fade out from current animation into new animation.
      * Does not fade if there is currently no active animation
+     *
      * @param fadeModifier Fade modifier, use {@link AbstractFadeModifier#standardFadeIn(int, Ease)} for simple fade.
      * @param newAnimation New animation, can be null to fade into default state.
      */
@@ -89,6 +92,7 @@ public class ModifierLayer<T extends IAnimation> implements IAnimation {
 
     /**
      * Fade out from current to a new animation
+     *
      * @param fadeModifier    Fade modifier, use {@link AbstractFadeModifier#standardFadeIn(int, Ease)} for simple fade.
      * @param newAnimation    New animation, can be null to fade into default state.
      * @param fadeFromNothing Do fade even if we go from nothing. (for KeyframeAnimation, it can be false by default)
@@ -142,19 +146,83 @@ public class ModifierLayer<T extends IAnimation> implements IAnimation {
         } else if (animation != null) animation.setupAnim(tickDelta);
     }
 
+    /**
+     * Retrieves the {@link FirstPersonMode} for the current object, based on the provided {@code tickDelta}.
+     * <p>
+     * The method determines the appropriate {@link FirstPersonMode} by following this logic:
+     * 1. It first attempts to retrieve the active {@link AbstractModifier} by calling {@link #getFirstPersonModifierOrDefault()}.
+     *    If a modifier is found, it delegates the call to the modifier's {@link AbstractModifier#getFirstPersonMode(float)} method.
+     * 2. If no modifier is available or applicable, it checks if there is an active animation.
+     *    If an animation exists, it delegates the call to the animation's {@link IAnimation#getFirstPersonMode(float)} method.
+     * 3. If neither a modifier nor an animation is present, it falls back to the default implementation
+     *    provided by the {@link IAnimation} interface.
+     *
+     * @param tickDelta A float value representing the partial tick time (used to interpolate between frames).
+     *                  This parameter is typically used in rendering calculations.
+     * @return The {@link FirstPersonMode} determined by the current modifier, animation, or the default implementation.
+     */
     @Override
     public @NotNull FirstPersonMode getFirstPersonMode(float tickDelta) {
-        if (modifiers.size() > 0) {
-            return modifiers.get(0).getFirstPersonMode(tickDelta);
-        } else if (animation != null) return animation.getFirstPersonMode(tickDelta);
+        AbstractModifier modifier = getFirstPersonModifierOrDefault();
+        if (modifier != null) {
+            return modifier.getFirstPersonMode(tickDelta);
+        }
+
+        if (animation != null) {
+            return animation.getFirstPersonMode(tickDelta);
+        }
         return IAnimation.super.getFirstPersonMode(tickDelta);
     }
 
+    /**
+     * Retrieves the {@link FirstPersonConfiguration} for the current object, based on the provided {@code tickDelta}.
+     * <p>
+     * The method determines the appropriate {@link FirstPersonConfiguration} by following this logic:
+     * 1. It first attempts to retrieve the active {@link AbstractModifier} by calling {@link #getFirstPersonModifierOrDefault()}.
+     *    If a modifier is found, it delegates the call to the modifier's {@link AbstractModifier#getFirstPersonConfiguration(float)} method.
+     * 2. If no modifier is available or applicable, it checks if there is an active animation.
+     *    If an animation exists, it delegates the call to the animation's {@link IAnimation#getFirstPersonConfiguration(float)} method.
+     * 3. If neither a modifier nor an animation is present, it falls back to the default implementation
+     *    provided by the {@link IAnimation} interface.
+     *
+     * @param tickDelta A float value representing the partial tick time (used to interpolate between frames).
+     *                  This parameter is typically used in rendering calculations.
+     * @return The {@link FirstPersonConfiguration} determined by the current modifier, animation, or the default implementation.
+     */
     @Override
     public @NotNull FirstPersonConfiguration getFirstPersonConfiguration(float tickDelta) {
-        if (modifiers.size() > 0) {
-            return modifiers.get(0).getFirstPersonConfiguration(tickDelta);
-        } else if (animation != null) return animation.getFirstPersonConfiguration(tickDelta);
+        AbstractModifier modifier = getFirstPersonModifierOrDefault();
+        if (modifier != null) {
+            return modifier.getFirstPersonConfiguration(tickDelta);
+        }
+
+        if (animation != null) {
+            return animation.getFirstPersonConfiguration(tickDelta);
+        }
         return IAnimation.super.getFirstPersonConfiguration(tickDelta);
+    }
+
+    /**
+     * Searches for and retrieves the highest-priority {@link AbstractModifier}
+     * from the list of modifiers, prioritizing instances of {@link FirstPersonModifier}.
+     * <p>
+     * The method performs the following:
+     * 1. Iterates through the {@code modifiers} list to find the first instance
+     *    of {@link FirstPersonModifier}. If found, it is returned immediately.
+     * 2. If no {@link FirstPersonModifier} is found, the first modifier in the list
+     *    (if it exists) is returned as a fallback.
+     * 3. If the list of modifiers is empty, {@code null} is returned.
+     *
+     * @return The highest-priority {@link AbstractModifier}, or {@code null} if
+     *         the modifier list is empty.
+     */
+    private AbstractModifier getFirstPersonModifierOrDefault() {
+        for (AbstractModifier modifier : modifiers) {
+            if (modifier instanceof FirstPersonModifier) {
+                return modifier;
+            }
+        }
+
+        return modifiers.isEmpty() ? null : modifiers.get(0);
     }
 }
