@@ -142,18 +142,19 @@ public class GeckoLibSerializer {
 
     private static void readDataAtTick(JsonObject currentNode, KeyframeAnimation.StateCollection stateCollection, int tick, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
         Ease ease = Ease.LINEAR;
+        Float easingArg = null;
         if (currentNode.has("lerp_mode")) {
-            String lerp = currentNode.get("lerp_mode").getAsString();
-            ease = lerp.equals("catmullrom") ? Ease.INOUTSINE : Easing.easeFromString(lerp); //IDK what am I doing
+            ease = Easing.easeFromString(currentNode.get("lerp_mode").getAsString());
         }
         KeyframeAnimation.StateCollection.State[] targetVec = getTargetVec(stateCollection, type);
         if (currentNode.has("easing")) ease = Easing.easeFromString(currentNode.get("easing").getAsString());
+        if (currentNode.has("easingArgs")) easingArg = currentNode.getAsJsonArray("easingArgs").get(0).getAsFloat();
         if (currentNode.has("pre"))
-            readCollection(targetVec, tick, ease, getVector(currentNode.get("pre")), emoteData, type);
+            readCollection(targetVec, tick, ease, easingArg, getVector(currentNode.get("pre")), emoteData, type);
         if (currentNode.has("vector"))
-            readCollection(targetVec, tick, ease, currentNode.get("vector").getAsJsonArray(), emoteData, type);
+            readCollection(targetVec, tick, ease, easingArg, currentNode.get("vector").getAsJsonArray(), emoteData, type);
         if (currentNode.has("post"))
-            readCollection(targetVec, tick, ease, getVector(currentNode.get("post")), emoteData, type);
+            readCollection(targetVec, tick, ease, easingArg, getVector(currentNode.get("post")), emoteData, type);
     }
 
     public static JsonArray getVector(JsonElement element) {
@@ -162,6 +163,10 @@ public class GeckoLibSerializer {
     }
 
     private static void readCollection(KeyframeAnimation.StateCollection.State[] a, int tick, Ease ease, JsonArray array, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
+        readCollection(a, tick, ease, null, array, emoteData, type);
+    }
+
+    private static void readCollection(KeyframeAnimation.StateCollection.State[] a, int tick, Ease ease, Float easingArg, JsonArray array, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
         if(a.length != 3)throw new ArrayStoreException("wrong array length");
         for(int i = 0; i < 3; i++){
             float value = array.get(i).getAsFloat();
@@ -181,7 +186,7 @@ public class GeckoLibSerializer {
             if (type != TransformType.SCALE) {
                 value += a[i].defaultValue;
             }
-            a[i].addKeyFrame(tick, value, ease, 0, true);
+            a[i].addKeyFrame(tick, value, ease, 0, true, easingArg);
         }
     }
 
