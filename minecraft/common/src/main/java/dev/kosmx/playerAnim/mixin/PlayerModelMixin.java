@@ -2,10 +2,7 @@ package dev.kosmx.playerAnim.mixin;
 
 import dev.kosmx.playerAnim.core.impl.AnimationProcessor;
 import dev.kosmx.playerAnim.core.util.SetableSupplier;
-import dev.kosmx.playerAnim.impl.IMutableModel;
-import dev.kosmx.playerAnim.impl.IPlayerForwarder;
-import dev.kosmx.playerAnim.impl.IPlayerModel;
-import dev.kosmx.playerAnim.impl.IUpperPartHelper;
+import dev.kosmx.playerAnim.impl.*;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.HumanoidModel;
@@ -121,6 +118,11 @@ public class PlayerModelMixin extends HumanoidModel<PlayerRenderState> implement
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "RETURN"))
     private void setEmote(PlayerRenderState playerRenderState, CallbackInfo ci){
         AnimationApplier emote = IPlayerForwarder.getApplier(playerRenderState);
+
+        //The player render state should always have a player... hopefully.
+        if (firstPersonNext && ((IAnimatedPlayer)(((IPlayerForwarder)playerRenderState).playerAnimator$getAnimatedPlayer()))
+                .playerAnimator_getAnimation().getFirstPersonMode().isEnabled()) firstPersonNext = false;
+
         if(!firstPersonNext && emote != null && emote.isActive()){
             emoteSupplier.set(emote);
 
