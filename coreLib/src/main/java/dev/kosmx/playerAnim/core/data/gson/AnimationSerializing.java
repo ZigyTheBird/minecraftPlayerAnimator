@@ -26,11 +26,7 @@ public class AnimationSerializing {
      */
     @Deprecated(forRemoval = true)
     public static List<KeyframeAnimation> deserializeAnimation(Reader stream) {
-        try {
-            return AnimationJson.GSON.fromJson(stream, AnimationJson.getListedTypeToken());
-        } catch (Exception e) {
-            return GeckoLibSerializer.GSON.fromJson(stream, GeckoLibSerializer.getListedTypeToken());
-        }
+        return AnimationJson.GSON.fromJson(stream, AnimationJson.getListedTypeToken());
     }
 
     /**
