@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * Where is the emote from
- * use {@link dev.kosmx.playerAnim.minecraftApi.codec}, AnimationCodecs class for deserializing instead.
+ * use dev.kosmx.playerAnim.minecraftApi.codec, AnimationCodecs class for deserializing instead.
  * <p>
  * This package may be removed in the future
  */
