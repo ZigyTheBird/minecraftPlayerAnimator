@@ -30,10 +30,6 @@ allprojects {
             name 'KosmX\'s maven'
             url 'https://maven.kosmx.dev/'
         }
-        maven {
-            name "dima_dencep"
-            url "https://repo.redlance.org/public"
-        }
         exclusiveContent {
             forRepository {
                 maven {
