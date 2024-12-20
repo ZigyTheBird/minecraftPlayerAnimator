@@ -5,7 +5,9 @@ import com.mojang.math.Axis;
 import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
 import dev.kosmx.playerAnim.core.util.Vec3f;
+import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.IPlayerForwarder;
+import dev.kosmx.playerAnim.impl.IPlayerModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -72,12 +74,12 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
 
 
     @Inject(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At("RETURN"))
-    private void applyBodyTransforms(PlayerRenderState playerRenderState, PoseStack matrixStack, float tickDelta, float g, CallbackInfo ci){
+    private void applyBodyTransforms(PlayerRenderState playerRenderState, PoseStack matrixStack, float bodyRot, float scale, CallbackInfo ci){
         var animationPlayer = IPlayerForwarder.getApplier(playerRenderState);
         if (animationPlayer == null) {
             return;
         }
-        animationPlayer.setTickDelta(tickDelta);
+        //animationPlayer.setTickDelta(tickDelta); TODO
         if(animationPlayer.isActive()){
 
             //These are additive properties
@@ -95,12 +97,12 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         }
     }
 
-    @Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;II)V"))
+    /*@Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/ModelPart;resetPose()V"))
     private void notifyModelOfFirstPerson(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl, CallbackInfo ci) {
-        /*if (this.getModel() instanceof IPlayerModel playerModel && !((IAnimatedPlayer)abstractClientPlayer).playerAnimator_getAnimation().getFirstPersonMode().isEnabled()) {
+        if (this.getModel() instanceof IPlayerModel playerModel && !((IAnimatedPlayer)abstractClientPlayer).playerAnimator_getAnimation().getFirstPersonMode().isEnabled()) {
             playerModel.playerAnimator_prepForFirstPersonRender(); TODO
-        }*/
-    }
+        }
+    }*/
 
     @Inject(
             method = "extractRenderState(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;F)V",
