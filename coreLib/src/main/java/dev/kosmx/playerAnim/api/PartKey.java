@@ -30,6 +30,15 @@ public class PartKey {
     private static final Map<String, PartKey> existingKeys = Collections.synchronizedMap(new HashMap<>());
 
     // static stuff (these fields will stay here for anyone to use):
+    public static final PartKey HEAD = keyForId("head");
+    public static final PartKey BODY = keyForId("body");
+    public static final PartKey RIGHT_ARM = keyForId("rightArm");
+    public static final PartKey LEFT_ARM = keyForId("leftArm");
+    public static final PartKey RIGHT_LEG = keyForId("rightLeg");
+    public static final PartKey LEFT_LEG = keyForId("leftLeg");
+    public static final PartKey RIGHT_ITEM = keyForId("rightItem");
+    public static final PartKey LEFT_ITEM = keyForId("leftItem");
+    public static final PartKey CAPE = keyForId("cape");
 
 
     /**
@@ -77,7 +86,7 @@ public class PartKey {
     /**
      * Get the appropriate partKey object, or creates a new identity if needed.
      * It is safe to invoke this concurrently, or with the same id multiple times. However, doing so defeats the purpose of fast mapping.
-     * @param id the model part string ID. (should be normalized to lowercase_camel_case)
+     * @param id the model part string ID. (should be normalized to camelCase)
      * @return PartKey for the given ID. For the same ID the same object must be returned.
      */
     @NotNull

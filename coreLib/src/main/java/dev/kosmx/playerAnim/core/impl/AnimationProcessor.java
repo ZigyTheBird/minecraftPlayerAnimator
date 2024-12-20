@@ -1,6 +1,7 @@
 package dev.kosmx.playerAnim.core.impl;
 
 
+import dev.kosmx.playerAnim.api.PartKey;
 import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
@@ -31,8 +32,8 @@ public class AnimationProcessor {
         return animation.isActive();
     }
 
-    public Vec3f get3DTransform(String modelName, TransformType type, Vec3f value0) {
-        return animation.get3DTransform(modelName, type, this.tickDelta, value0);
+    public Vec3f get3DTransform(PartKey partKey, TransformType type, Vec3f value0) {
+        return animation.get3DTransform(partKey, type, this.tickDelta, value0);
     }
 
     public void setTickDelta(float tickDelta) {
@@ -52,8 +53,8 @@ public class AnimationProcessor {
         return animation.getFirstPersonConfiguration(tickDelta);
     }
 
-    public Pair<Float, Float> getBend(String modelName) {
-        Vec3f bendVec = this.get3DTransform(modelName, TransformType.BEND, Vec3f.ZERO);
+    public Pair<Float, Float> getBend(PartKey partKey) {
+        Vec3f bendVec = this.get3DTransform(partKey, TransformType.BEND, Vec3f.ZERO);
         return new Pair<>(bendVec.getX(), bendVec.getY());
     }
 
