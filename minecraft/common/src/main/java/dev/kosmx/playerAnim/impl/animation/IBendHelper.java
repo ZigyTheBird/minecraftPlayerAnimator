@@ -5,7 +5,6 @@ import dev.kosmx.playerAnim.core.util.Pair;
 import dev.kosmx.playerAnim.impl.Helper;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.core.Direction;
-
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -31,6 +30,8 @@ public interface IBendHelper {
 
     void initBend(ModelPart modelPart, Direction direction);
 
+    void initCapeBend(ModelPart modelPart);
+
     class DummyBendable implements IBendHelper {
 
         @Override
@@ -45,6 +46,11 @@ public interface IBendHelper {
 
         @Override
         public void initBend(ModelPart modelPart, Direction direction) {
+
+        }
+
+        @Override
+        public void initCapeBend(ModelPart modelPart) {
 
         }
     }

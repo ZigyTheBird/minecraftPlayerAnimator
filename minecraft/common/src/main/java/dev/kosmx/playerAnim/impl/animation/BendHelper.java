@@ -5,14 +5,11 @@ import io.github.kosmx.bendylib.ModelPartAccessor;
 import io.github.kosmx.bendylib.impl.BendableCuboid;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.core.Direction;
-
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 @ApiStatus.Internal
 public class BendHelper implements IBendHelper {
-
-
     @Override
     public void bend(ModelPart modelPart, float axis, float rotation){
         // Don't enable bend until rotation is bigger than epsilon. This should avoid unnecessary heavy calculations.
@@ -39,5 +36,11 @@ public class BendHelper implements IBendHelper {
         ModelPartAccessor.optionalGetCuboid(modelPart, 0).ifPresent(mutableModelPart -> mutableModelPart.registerMutator("bend", data -> new BendableCuboid.Builder().setDirection(direction).build(data)));
     }
 
-
+    @Override
+    public void initCapeBend(ModelPart modelPart) {
+        ModelPartAccessor.optionalGetCuboid(modelPart, 0).ifPresent(mutableModelPart -> mutableModelPart.registerMutator("bend", data -> {
+            data.pivot = 6;
+            return new BendableCuboid.Builder().setDirection(Direction.UP).build(data);
+        }));
+    }
 }

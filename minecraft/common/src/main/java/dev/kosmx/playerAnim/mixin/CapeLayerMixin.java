@@ -7,6 +7,7 @@ import com.mojang.math.Axis;
 import dev.kosmx.playerAnim.core.util.Pair;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
+import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -14,7 +15,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.CapeLayer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.util.Mth;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,34 +32,28 @@ public abstract class CapeLayerMixin extends RenderLayer<AbstractClientPlayer, P
         AnimationApplier emote = ((IAnimatedPlayer) abstractClientPlayer).playerAnimator_getAnimation();
         if (emote.isActive()) {
             ModelPart torso = this.getParentModel().body;
-            Pair<Float, Float> bend = emote.getBend("torso");
+            Pair<Float, Float> torsoBend = emote.getBend("torso");
+            Pair<Float, Float> bodyBend = emote.getBend("body");
+            Pair<Float, Float> bend = new Pair<>(torsoBend.getLeft() + bodyBend.getLeft(), torsoBend.getRight() + bodyBend.getRight());
 
             poseStack.translate(torso.x / 16, torso.y / 16, torso.z / 16);
             poseStack.mulPose((new Quaternionf()).rotateXYZ(torso.xRot, torso.yRot, torso.zRot));
-            if (bend.getRight() != 0) {
-                poseStack.translate(0, 0.375F * torso.yScale, 0);
-                poseStack.mulPose(Axis.XP.rotation(bend.getRight()));
-                poseStack.translate(0, -0.375F * torso.yScale, 0);
-            }
+            IBendHelper.rotateMatrixStack(poseStack, torsoBend);
             poseStack.translate(0.0F, 0.0F, 0.125F);
-
-            double d = Mth.lerp(h, abstractClientPlayer.xCloakO, abstractClientPlayer.xCloak)
-                    - Mth.lerp(h, abstractClientPlayer.xo, abstractClientPlayer.getX());
-            double m = Mth.lerp(h, abstractClientPlayer.zCloakO, abstractClientPlayer.zCloak)
-                    - Mth.lerp(h, abstractClientPlayer.zo, abstractClientPlayer.getZ());
-            float n = Mth.rotLerp(h, abstractClientPlayer.yBodyRotO, abstractClientPlayer.yBodyRot);
-            double o = Mth.sin(n * (float) (Math.PI / 180.0));
-            double p = -Mth.cos(n * (float) (Math.PI / 180.0));
-            float s = (float) (d * p - m * o) * 100.0F;
-            s = Mth.clamp(s, -20.0F, 20.0F);
-
-            poseStack.mulPose(Axis.XP.rotationDegrees(6.0F / 2.0F));
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - s / 2.0F));
+            poseStack.mulPose(Axis.YP.rotationDegrees(180));
 
             ModelPart cape = ((PlayerModelAccessor)this.getParentModel()).getCloak();
             cape.x = 0;
             cape.y = 0;
             cape.z = 0;
+            cape.xRot = 0;
+            cape.yRot = 0;
+            cape.zRot = 0;
+
+            IBendHelper.INSTANCE.bend(cape, bend);
+        }
+        else {
+            IBendHelper.INSTANCE.bend(((PlayerModelAccessor)this.getParentModel()).getCloak(), null);
         }
     }
 
