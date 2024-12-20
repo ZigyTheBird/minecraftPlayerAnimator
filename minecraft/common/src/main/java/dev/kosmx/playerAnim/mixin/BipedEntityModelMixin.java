@@ -68,15 +68,26 @@ public abstract class BipedEntityModelMixin<T extends HumanoidRenderState> exten
     @Override
     public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color){
         if(Helper.isBendEnabled() && this.animation.get() != null && this.animation.get().isActive()){
-            allParts().forEach((part)->{
+            this.head.getAllParts().forEach((part)->{
                 if(! ((IUpperPartHelper) part).isUpperPart()){
                     part.render(matrices, vertices, light, overlay, color);
                 }
             });
+            this.body.getAllParts().forEach((part)->{
+                if(! ((IUpperPartHelper) part).isUpperPart()){
+                    part.render(matrices, vertices, light, overlay, color);
+                }
+            });
+
             SetableSupplier<AnimationProcessor> emoteSupplier = this.animation;
             matrices.pushPose();
             IBendHelper.rotateMatrixStack(matrices, emoteSupplier.get().getBend("body"));
-            allParts().forEach((part)->{
+            this.head.getAllParts().forEach((part)->{
+                if(((IUpperPartHelper) part).isUpperPart()){
+                    part.render(matrices, vertices, light, overlay, color);
+                }
+            });
+            this.body.getAllParts().forEach((part)->{
                 if(((IUpperPartHelper) part).isUpperPart()){
                     part.render(matrices, vertices, light, overlay, color);
                 }
