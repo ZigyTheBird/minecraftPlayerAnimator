@@ -17,7 +17,7 @@
     "PlayerModelAccessor",
     "PlayerModelMixin",
     "PlayerRendererMixin",
-    "firstPerson.CameraAccessor",
+    "PlayerRenderStateMixin",
     "firstPerson.EntityRenderDispatcherMixin",
     "firstPerson.ItemInHandRendererMixin",
     "firstPerson.LevelRendererMixin",

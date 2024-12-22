@@ -7,8 +7,8 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Internal
 public interface IMutableModel {
 
-    void setEmoteSupplier(SetableSupplier<AnimationProcessor> emoteSupplier);
+    void playerAnimator$setAnimationSupplier(SetableSupplier<AnimationProcessor> emoteSupplier);
 
-    SetableSupplier<AnimationProcessor> getEmoteSupplier();
+    SetableSupplier<AnimationProcessor> playerAnimator$getAnimationSupplier();
 
 }

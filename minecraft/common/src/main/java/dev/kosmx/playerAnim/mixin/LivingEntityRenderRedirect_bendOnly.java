@@ -61,7 +61,7 @@ public abstract class LivingEntityRenderRedirect_bendOnly<T extends Entity, M ex
         if (Helper.isBendEnabled()) {
             poseStack.pushPose();
             RenderLayer<T, M> layer = instance.next();
-            if (livingEntity instanceof Player && livingEntity instanceof IAnimatedPlayer && ((IAnimatedPlayer) livingEntity).playerAnimator_getAnimation().isActive() && ((IUpperPartHelper) layer).isUpperPart()) {
+            if (livingEntity instanceof Player && livingEntity instanceof IAnimatedPlayer && ((IAnimatedPlayer) livingEntity).playerAnimator_getAnimation().isActive() && ((IUpperPartHelper) layer).playerAnimator$isUpperPart()) {
                 IBendHelper.rotateMatrixStack(poseStack, ((IAnimatedPlayer) livingEntity).playerAnimator_getAnimation().getBend("body"));
             }
             return layer;

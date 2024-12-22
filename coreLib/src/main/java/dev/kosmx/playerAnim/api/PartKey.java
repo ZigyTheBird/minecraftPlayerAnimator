@@ -30,15 +30,16 @@ public class PartKey {
     private static final Map<String, PartKey> existingKeys = Collections.synchronizedMap(new HashMap<>());
 
     // static stuff (these fields will stay here for anyone to use):
-    public static final PartKey HEAD = keyForId("head");
-    public static final PartKey BODY = keyForId("body");
-    public static final PartKey RIGHT_ARM = keyForId("rightArm");
-    public static final PartKey LEFT_ARM = keyForId("leftArm");
-    public static final PartKey RIGHT_LEG = keyForId("rightLeg");
-    public static final PartKey LEFT_LEG = keyForId("leftLeg");
-    public static final PartKey RIGHT_ITEM = keyForId("rightItem");
-    public static final PartKey LEFT_ITEM = keyForId("leftItem");
-    public static final PartKey CAPE = keyForId("cape");
+    public static final @NotNull PartKey HEAD = keyForId("head");
+    public static final @NotNull PartKey BODY = keyForId("body");
+    public static final @NotNull PartKey TORSO = keyForId("torso");
+    public static final @NotNull PartKey RIGHT_ARM = keyForId("rightArm");
+    public static final @NotNull PartKey LEFT_ARM = keyForId("leftArm");
+    public static final @NotNull PartKey RIGHT_LEG = keyForId("rightLeg");
+    public static final @NotNull PartKey LEFT_LEG = keyForId("leftLeg");
+    public static final @NotNull PartKey RIGHT_ITEM = keyForId("rightItem");
+    public static final @NotNull PartKey LEFT_ITEM = keyForId("leftItem");
+    public static final @NotNull PartKey CAPE = keyForId("cape");
 
 
     /**

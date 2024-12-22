@@ -41,9 +41,6 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<T> i
     @Shadow @Final public ModelPart leftPants;
     @Shadow @Final private ModelPart cloak;
     @Unique
-    private final SetableSupplier<AnimationProcessor> emoteSupplier = new SetableSupplier<>();
-
-    @Unique
     private boolean firstPersonNext = false;
 
     public PlayerModelMixin(ModelPart modelPart, Function<ResourceLocation, RenderType> function) {
@@ -53,9 +50,6 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<T> i
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initBendableStuff(ModelPart modelPart, boolean bl, CallbackInfo ci){
         IMutableModel thisWithMixin = (IMutableModel) this;
-        emoteSupplier.set(null);
-
-        thisWithMixin.setEmoteSupplier(emoteSupplier);
 
         addBendMutator(this.jacket, Direction.DOWN);
         addBendMutator(this.rightPants, Direction.UP);
@@ -64,8 +58,8 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<T> i
         addBendMutator(this.leftSleeve, Direction.UP);
         IBendHelper.INSTANCE.initCapeBend(this.cloak);
 
-        ((IUpperPartHelper)rightSleeve).setUpperPart(true);
-        ((IUpperPartHelper)leftSleeve).setUpperPart(true);
+        ((IUpperPartHelper)rightSleeve).playerAnimator$setUpperPart(true);
+        ((IUpperPartHelper)leftSleeve).playerAnimator$setUpperPart(true);
     }
 
     @Unique
