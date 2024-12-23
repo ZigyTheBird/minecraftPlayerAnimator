@@ -3,7 +3,8 @@
 PlayerAnimator is a minecraft library to animate the **player** while trying to break as few mods as possible.    
 If you want to add new entities, use [Geckolib](https://geckolib.com/#mods).
 
-If you want to trigger simple animations from the server, you might want to use [Emotecraft's server-side API](https://github.com/KosmX/emotes/tree/dev/emotesAPI/src/main/java/io/github/kosmx/emotes/api/events/server).
+You can use [Zigy's Player Animator API](https://github.com/ZigyTheBird/ZigysPlayerAnimatorAPI/wiki/Getting-Started) in order to play animations from the server, with advanced options and good documentation.  
+You can also use [Emotecraft's server-side API](https://github.com/KosmX/emotes/tree/dev/emotesAPI/src/main/java/io/github/kosmx/emotes/api/events/server).
 
 ## Official projects
 **GitHub project** https://github.com/KosmX/minecraftPlayerAnimator  
