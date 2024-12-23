@@ -62,7 +62,7 @@ dependencies {
     //You might want bendy-lib. playerAnimator will wrap it.
     //runtimeOnly "io.github.kosmx.bendy-lib:bendy-lib-forge:${project.bendylib_version}"
     
-    //JarJar only works on MC 1.19+. Do not use JarJar on older version!
+    //JarJar only works on MC 1.19+. Do not use JarJar on older versions!
 }
 ```
 
