@@ -230,6 +230,10 @@ public class GeckoLibSerializer implements JsonDeserializer<List<KeyframeAnimati
     }
 
     private static void readCollection(KeyframeAnimation.StateCollection.State[] a, int tick, Ease ease, JsonArray array, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
+        readCollection(a, tick, ease, null, array, emoteData, type);
+    }
+
+    private static void readCollection(KeyframeAnimation.StateCollection.State[] a, int tick, Ease ease, Float easingArg, JsonArray array, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
         if (type != TransformType.BEND) {
             if (a.length != 3) throw new ArrayStoreException("wrong array length");
             for (int i = 0; i < 3; i++) {
@@ -247,13 +251,13 @@ public class GeckoLibSerializer implements JsonDeserializer<List<KeyframeAnimati
                     }
                 }
                 value += a[i].defaultValue;
-                a[i].addKeyFrame(tick, value, ease, 0, true);
+                a[i].addKeyFrame(tick, value, ease, 0, true, easingArg);
             }
         }
         else {
             if (a.length != 2) throw new ArrayStoreException("wrong array length");
-            a[0].addKeyFrame(tick, array.get(0).getAsFloat(), ease, 0, true);
-            a[1].addKeyFrame(tick, array.get(1).getAsFloat() * (readingTorsoBend ? 1 : -1), ease, 0, true);
+            a[0].addKeyFrame(tick, array.get(0).getAsFloat(), ease, 0, true, easingArg);
+            a[1].addKeyFrame(tick, array.get(1).getAsFloat() * (readingTorsoBend ? 1 : -1), ease, 0, true, easingArg);
         }
     }
 
