@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import dev.kosmx.playerAnim.core.data.AnimationFormat;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Easing;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -18,13 +19,27 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
 
     private final static int modVersion = 3;
 
+    @ApiStatus.Internal
+    public static final Gson GSON;
+
     /**
      * TypeToken helper for serializing
      *
      * @return TypeToken for animation deserialization
      */
+    @Deprecated
+    @ApiStatus.Internal
     public static Type getListedTypeToken() {
         return new TypeToken<List<KeyframeAnimation>>() {}.getType();
+    }
+
+    static {
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+        AnimationJson animationJson = new AnimationJson();
+        builder.registerTypeAdapter(AnimationJson.getListedTypeToken(), animationJson);
+        builder.registerTypeAdapter(KeyframeAnimation.class, animationJson);
+        GSON = builder.create();
     }
 
     /**
@@ -35,7 +50,7 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         JsonObject node = json.getAsJsonObject();
 
         if(!node.has("emote")){
-            return GeckoLibSerializer.serialize(node);
+            return GeckoLibSerializer.deserialize(node); // TODO remove
         }
 
         int version = 1;
@@ -154,11 +169,11 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         addPartIfExists(part.pitch, "pitch", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.yaw, "yaw", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.roll, "roll", partNode, degrees, tick, easing, turn);
-        addPartIfExists(part.bend, "bend", partNode, degrees, tick, easing, turn);
-        addPartIfExists(part.bendDirection, "axis", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.scaleX, "scaleX", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.scaleY, "scaleY", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.scaleZ, "scaleZ", partNode, degrees, tick, easing, turn);
+        addPartIfExists(part.bend, "bend", partNode, degrees, tick, easing, turn);
+        addPartIfExists(part.bendDirection, "axis", partNode, degrees, tick, easing, turn);
     }
 
     private void addPartIfExists(KeyframeAnimation.StateCollection.State part, String name, JsonObject node, boolean degrees, int tick, String easing, int turn){

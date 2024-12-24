@@ -1,8 +1,8 @@
 package dev.kosmx.playerAnim.core.data;
 
 import dev.kosmx.playerAnim.core.util.Ease;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;

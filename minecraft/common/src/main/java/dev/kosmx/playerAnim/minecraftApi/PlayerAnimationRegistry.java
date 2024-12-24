@@ -1,9 +1,10 @@
 package dev.kosmx.playerAnim.minecraftApi;
 
-import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
-import dev.kosmx.playerAnim.core.data.gson.AnimationSerializing;
+import dev.kosmx.playerAnim.api.IPlayable;
+import dev.kosmx.playerAnim.minecraftApi.codec.AnimationCodecs;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -11,12 +12,10 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,11 +35,21 @@ import java.util.Optional;
  * Use {@link PlayerAnimationRegistry#getAnimation(ResourceLocation)} to fetch an animation
  * <br><br>
  * Extra animations can be added by ResourcePack(s) or other mods
+ * <br><br>
+ * Breaking change with 2.0.0: Registry now returns an IPlayable type instead of a KeyframeAnimation.
+ * Feel free to safely cast it into KeyframeAnimation:
+ * <br>
+ * <code>if (PlayerAnimationRegistry.getAnimation(id) instanceof KeyframeAnimation animation) {...}</code>
+ * <br>
+ * Or to simply play the result, do<br>
+ * <code>PlayerAnimationRegistry.getAnimation(id).playAnimation()</code> <br>
+ * This change will allow more animation formats to be supported. (Don't forget, you can still wrap the unknown animation in custom wrappers :D)
  */
 @Environment(EnvType.CLIENT)
 public final class PlayerAnimationRegistry {
 
-    private static final HashMap<ResourceLocation, KeyframeAnimation> animations = new HashMap<>();
+    private static final HashMap<ResourceLocation, IPlayable> animations = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(PlayerAnimationRegistry.class);
 
     /**
      * Get an animation from the registry, using Identifier(MODID, animation_name) as key
@@ -48,7 +57,7 @@ public final class PlayerAnimationRegistry {
      * @return animation, <code>null</code> if no animation
      */
     @Nullable
-    public static KeyframeAnimation getAnimation(@NotNull ResourceLocation identifier) {
+    public static IPlayable getAnimation(@NotNull ResourceLocation identifier) {
         return animations.get(identifier);
     }
 
@@ -58,14 +67,14 @@ public final class PlayerAnimationRegistry {
      * @return Optional animation
      */
     @NotNull
-    public static Optional<KeyframeAnimation> getAnimationOptional(@NotNull ResourceLocation identifier) {
+    public static Optional<IPlayable> getAnimationOptional(@NotNull ResourceLocation identifier) {
         return Optional.ofNullable(getAnimation(identifier));
     }
 
     /**
      * @return an unmodifiable map of all the animations
      */
-    public static Map<ResourceLocation, KeyframeAnimation> getAnimations() {
+    public static Map<ResourceLocation, IPlayable> getAnimations() {
         return Map.copyOf(animations);
     }
 
@@ -74,9 +83,10 @@ public final class PlayerAnimationRegistry {
      * @param modid namespace (assets/modid)
      * @return map of path and animations
      */
-    public static Map<String, KeyframeAnimation> getModAnimations(String modid) {
-        HashMap<String, KeyframeAnimation> map = new HashMap<>();
-        for (Map.Entry<ResourceLocation, KeyframeAnimation> entry: animations.entrySet()) {
+    @NotNull
+    public static Map<String, IPlayable> getModAnimations(@NotNull String modid) {
+        HashMap<String, IPlayable> map = new HashMap<>();
+        for (Map.Entry<ResourceLocation, IPlayable> entry: animations.entrySet()) {
             if (entry.getKey().getNamespace().equals(modid)) {
                 map.put(entry.getKey().getPath(), entry.getValue());
             }
@@ -89,25 +99,36 @@ public final class PlayerAnimationRegistry {
      * Internal use only!
      */
     @ApiStatus.Internal
-    public static void resourceLoaderCallback(@NotNull ResourceManager manager, Logger logger) {
+    public static void resourceLoaderCallback(@NotNull ResourceManager manager) {
         animations.clear();
-        for (var resource: manager.listResources("player_animation", location -> location.getPath().endsWith(".json")).entrySet()) {
-            try (var input = resource.getValue().open()) {
 
-                //Deserialize the animation json. GeckoLib animation json can contain multiple animations.
-                for (var animation : AnimationSerializing.deserializeAnimation(input)) {
-
-                    //Save the animation for later use.
-                    animations.put(new ResourceLocation(resource.getKey().getNamespace(), PlayerAnimationRegistry.serializeTextToString((String) animation.extraData.get("name")).toLowerCase(Locale.ROOT)), animation);
+        for (var resource: manager.listResources("player_animations", ignore -> true).entrySet()) {
+            var extension = AnimationCodecs.getExtension(resource.getKey().getPath());
+            if (extension == null) continue;
+            var a = AnimationCodecs.deserialize(extension, () -> {
+                try {
+                    return resource.getValue().open();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-            } catch(IOException e) {
-                logger.error("Error while loading payer animation: " + resource.getKey());
-                logger.error(e.getMessage());
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                String sStackTrace = sw.toString(); // stack trace as a string
-                logger.error(sStackTrace);
+            });
+            for(var animation: a) {
+                animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), serializeTextToString(animation.getName())), animation);
+            }
+        }
+        for (var resource: manager.listResources("player_animation", ignore -> true).entrySet()) {
+            var extension = AnimationCodecs.getExtension(resource.getKey().getPath());
+            if (extension == null) continue;
+            logger.warn("[WARNING FOR MOD DEVS] Animation {} is in wrong directory: \"player_animation\", please place it in \"player_animations\".", resource.getKey().getPath());
+            var a = AnimationCodecs.deserialize(extension, () -> {
+                try {
+                    return resource.getValue().open();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            for(var animation: a) {
+                animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), serializeTextToString(animation.getName())), animation);
             }
         }
     }
@@ -118,7 +139,7 @@ public final class PlayerAnimationRegistry {
      */
     public static String serializeTextToString(String arg) {
         try {
-            var component = Component.Serializer.fromJson(arg);
+            var component = Component.Serializer.fromJson(arg, RegistryAccess.EMPTY);
             if (component != null) {
                 return component.getString();
             }

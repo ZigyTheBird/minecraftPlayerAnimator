@@ -1,17 +1,17 @@
 package dev.kosmx.playerAnim.core.data.gson;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.core.data.AnimationFormat;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Easing;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +20,39 @@ import java.util.Map;
  * Serialize movements as emotes from GeckoLib format
  * <a href="https://geckolib.com/">...</a>
  */
-public class GeckoLibSerializer {
-    public static List<KeyframeAnimation> serialize(JsonObject node){
+public class GeckoLibSerializer implements JsonDeserializer<List<KeyframeAnimation>> {
+    @ApiStatus.Internal
+    public static final Gson GSON;
+
+    private static boolean readingTorsoBend = false;
+
+    /**
+     * TypeToken helper for serializing
+     *
+     * @return TypeToken for animation deserialization
+     */
+    @Deprecated
+    @ApiStatus.Internal
+    public static Type getListedTypeToken() {
+        return new TypeToken<List<KeyframeAnimation>>() {}.getType();
+    }
+
+    static {
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+        GeckoLibSerializer gJson = new GeckoLibSerializer();
+        builder.registerTypeAdapter(GeckoLibSerializer.getListedTypeToken(), gJson);
+        builder.registerTypeAdapter(KeyframeAnimation.class, gJson);
+        GSON = builder.create();
+    }
+
+
+    @Override
+    public List<KeyframeAnimation> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        return deserialize(json.getAsJsonObject());
+    }
+
+    public static List<KeyframeAnimation> deserialize(JsonObject node){
         try {
             return readAnimations(node.get("animations").getAsJsonObject());
         } catch(NumberFormatException e) {
@@ -69,11 +100,47 @@ public class GeckoLibSerializer {
 
     private static void keyframeSerializer(KeyframeAnimation.AnimationBuilder emoteData, JsonObject node){
         for (Map.Entry<String, JsonElement> entry : node.entrySet()) {
-            readBone(emoteData.getOrCreatePart(snake2Camel(entry.getKey())), entry.getValue().getAsJsonObject(), emoteData);
+            if (!entry.getKey().endsWith("_bend")) {
+                readBone(emoteData.getOrCreatePart(snake2Camel(entry.getKey())), entry.getValue().getAsJsonObject(), emoteData);
+            }
+            else {
+                String name = entry.getKey().replace("_bend", "");
+                if (name.equals("torso")) {
+                    name = "body";
+                    readingTorsoBend = true;
+                }
+                readBoneBend(emoteData.getPart(snake2Camel(name)), entry.getValue().getAsJsonObject(), emoteData);
+                readingTorsoBend = false;
+            }
         }
     }
 
-    private static void readBone(KeyframeAnimation.StateCollection stateCollection, JsonObject node, KeyframeAnimation.AnimationBuilder emoteData){
+    private static void readBoneBend(KeyframeAnimation.StateCollection stateCollection, JsonObject node, KeyframeAnimation.AnimationBuilder emoteData) {
+        if(node.has("rotation")){
+            JsonElement jsonRotation = node.get("rotation");
+            if(jsonRotation.isJsonArray()){
+                readCollection(getTargetVec(stateCollection, TransformType.BEND), 0, Ease.LINEAR, jsonRotation.getAsJsonArray(), emoteData, TransformType.BEND);
+            }
+            else {
+                jsonRotation.getAsJsonObject().entrySet().forEach(entry -> {
+                    if(entry.getKey().equals("vector")){
+                        readCollection(getTargetVec(stateCollection, TransformType.BEND), 0, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, TransformType.BEND);
+                    }
+                    else if (!entry.getKey().equals("easing")) {
+                        int tick = (int) (Float.parseFloat(entry.getKey()) * 20);
+                        if (entry.getValue().isJsonArray()) {
+                            readCollection(getTargetVec(stateCollection, TransformType.BEND), tick, Ease.CONSTANT, entry.getValue().getAsJsonArray(), emoteData, TransformType.BEND);
+                        }
+                        else {
+                            readDataAtTick(entry.getValue().getAsJsonObject(), stateCollection, tick, emoteData, TransformType.BEND);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private static void readBone(KeyframeAnimation.StateCollection stateCollection, JsonObject node, KeyframeAnimation.AnimationBuilder emoteData) {
         if(node.has("rotation")){
             JsonElement jsonRotation = node.get("rotation");
             if(jsonRotation.isJsonArray()){
@@ -163,30 +230,30 @@ public class GeckoLibSerializer {
     }
 
     private static void readCollection(KeyframeAnimation.StateCollection.State[] a, int tick, Ease ease, JsonArray array, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
-        readCollection(a, tick, ease, null, array, emoteData, type);
-    }
-
-    private static void readCollection(KeyframeAnimation.StateCollection.State[] a, int tick, Ease ease, Float easingArg, JsonArray array, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
-        if(a.length != 3)throw new ArrayStoreException("wrong array length");
-        for(int i = 0; i < 3; i++){
-            float value = array.get(i).getAsFloat();
-            if (type == TransformType.POSITION) {
-                if (a[0] == emoteData.body.x) {
-                    value = value / 16f;
-                    if (i == 0) value = -value;
+        if (type != TransformType.BEND) {
+            if (a.length != 3) throw new ArrayStoreException("wrong array length");
+            for (int i = 0; i < 3; i++) {
+                float value = array.get(i).getAsFloat();
+                if (type == TransformType.POSITION) {
+                    if (a[0] == emoteData.body.x) {
+                        value = value / 16f;
+                        if (i == 0) value = -value;
+                    } else if (i == 1) {
+                        value = -value;
+                    }
+                } else if (type == TransformType.ROTATION) {
+                    if (a[0] == emoteData.body.pitch && i != 2) {
+                        value = -value;
+                    }
                 }
-                else if (i == 1) {
-                    value = -value;
-                }
-            } else if (type == TransformType.ROTATION) {
-                if (a[0] == emoteData.body.pitch && i != 2) {
-                    value = -value;
-                }
-            }
-            if (type != TransformType.SCALE) {
                 value += a[i].defaultValue;
+                a[i].addKeyFrame(tick, value, ease, 0, true);
             }
-            a[i].addKeyFrame(tick, value, ease, 0, true, easingArg);
+        }
+        else {
+            if (a.length != 2) throw new ArrayStoreException("wrong array length");
+            a[0].addKeyFrame(tick, array.get(0).getAsFloat(), ease, 0, true);
+            a[1].addKeyFrame(tick, array.get(1).getAsFloat() * (readingTorsoBend ? 1 : -1), ease, 0, true);
         }
     }
 

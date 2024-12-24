@@ -4,7 +4,6 @@ import dev.kosmx.playerAnim.api.layered.AnimationContainer;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import lombok.Setter;
-
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("rawtypes")

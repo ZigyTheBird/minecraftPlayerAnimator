@@ -6,8 +6,8 @@ import dev.kosmx.playerAnim.core.impl.AnimationProcessor;
 import dev.kosmx.playerAnim.core.util.SetableSupplier;
 import dev.kosmx.playerAnim.impl.Helper;
 import dev.kosmx.playerAnim.impl.IMutableModel;
-import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import dev.kosmx.playerAnim.impl.IUpperPartHelper;
+import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -60,16 +60,16 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> extends Agea
 
     @Intrinsic(displace = true)
     @Override
-    public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha){
+    public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color){
         if(Helper.isBendEnabled() && this.animation.get() != null && this.animation.get().isActive()){
             this.headParts().forEach((part)->{
                 if(! ((IUpperPartHelper) part).isUpperPart()){
-                    part.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+                    part.render(matrices, vertices, light, overlay, color);
                 }
             });
             this.bodyParts().forEach((part)->{
                 if(! ((IUpperPartHelper) part).isUpperPart()){
-                    part.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+                    part.render(matrices, vertices, light, overlay, color);
                 }
             });
 
@@ -78,16 +78,16 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> extends Agea
             IBendHelper.rotateMatrixStack(matrices, emoteSupplier.get().getBend("body"));
             this.headParts().forEach((part)->{
                 if(((IUpperPartHelper) part).isUpperPart()){
-                    part.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+                    part.render(matrices, vertices, light, overlay, color);
                 }
             });
             this.bodyParts().forEach((part)->{
                 if(((IUpperPartHelper) part).isUpperPart()){
-                    part.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+                    part.render(matrices, vertices, light, overlay, color);
                 }
             });
             matrices.popPose();
-        } else super.renderToBuffer(matrices, vertices, light, overlay, red, green, blue, alpha);
+        } else super.renderToBuffer(matrices, vertices, light, overlay, color);
     }
 
     @Final

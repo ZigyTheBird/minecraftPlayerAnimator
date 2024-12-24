@@ -1,16 +1,18 @@
 package dev.kosmx.playerAnim.core.data;
 
 
+import dev.kosmx.playerAnim.api.IPlayable;
+import dev.kosmx.playerAnim.api.layered.IActualAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.core.data.opennbs.NBS;
 import dev.kosmx.playerAnim.core.util.Ease;
 import lombok.Getter;
-
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import javax.annotation.concurrent.Immutable;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
  * Used to store Emote data
@@ -29,7 +31,7 @@ import java.util.function.Supplier;
  */
 @Immutable
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public final class KeyframeAnimation implements Supplier<UUID> {
+public final class KeyframeAnimation implements IPlayable {
     //Time, while the player can move to the beginning pose
 
     public static final StateCollection.State EMPTY_STATE = new StateCollection.State("empty", 0, 0, false);
@@ -47,7 +49,14 @@ public final class KeyframeAnimation implements Supplier<UUID> {
     public final boolean isEasingBefore;
     public final boolean nsfw;
 
+    /**
+     * -- GETTER --
+     *  Uuid of the emote. used for key binding and for server-client identification
+     *
+     * @return UUID
+     */
     //Emote identifier code.
+    @Getter
     private final UUID uuid;
     /**
      * Is the uuid generated when loading or was loaded from a file
@@ -166,15 +175,6 @@ public final class KeyframeAnimation implements Supplier<UUID> {
         return isInfinite || tick < stopTick && tick > 0;
     }
 
-    /**
-     * Uuid of the emote. used for key binding and for server-client identification
-     *
-     * @return UUID
-     */
-    public UUID getUuid() {
-        return this.uuid;
-    }
-
     @Override
     public UUID get() {
         return this.uuid;
@@ -201,6 +201,16 @@ public final class KeyframeAnimation implements Supplier<UUID> {
 
     public Optional<StateCollection> getPartOptional(String id) {
         return Optional.ofNullable(getPart(id));
+    }
+
+    @Override
+    public @NotNull IActualAnimation<KeyframeAnimationPlayer> playAnimation() {
+        return new KeyframeAnimationPlayer(this);
+    }
+
+    @Override
+    public @NotNull String getName() {
+        return ((String)extraData.get("name")).toLowerCase(Locale.ROOT);
     }
 
 

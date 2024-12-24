@@ -4,12 +4,15 @@ import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
-import dev.kosmx.playerAnim.core.util.*;
-
+import dev.kosmx.playerAnim.core.util.MathHelper;
+import dev.kosmx.playerAnim.core.util.Pair;
+import dev.kosmx.playerAnim.core.util.Vec3f;
+import dev.kosmx.playerAnim.core.util.Vector3;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +33,7 @@ import java.util.Map;
  *
  */
 @SuppressWarnings({"unused", "ConstantConditions"})
-public class KeyframeAnimationPlayer implements IAnimation {
+public class KeyframeAnimationPlayer implements IActualAnimation<KeyframeAnimationPlayer> {
 
 
 

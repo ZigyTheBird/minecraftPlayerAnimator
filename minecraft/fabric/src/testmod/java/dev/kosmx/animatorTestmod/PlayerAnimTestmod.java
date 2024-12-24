@@ -3,15 +3,14 @@ package dev.kosmx.animatorTestmod;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
-import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
 import dev.kosmx.playerAnim.api.layered.modifier.MirrorModifier;
 import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -41,7 +40,7 @@ public class PlayerAnimTestmod implements ClientModInitializer {
         LOGGER.warn("Testmod is loading :D");
 
         //You might use the EVENT to register new animations, or you can use Mixin.
-        PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(new ResourceLocation("testmod", "animation"), 42, (player) -> {
+        PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(ResourceLocation.fromNamespaceAndPath("testmod", "animation"), 42, (player) -> {
             if (player instanceof LocalPlayer) {
                 //animationStack.addAnimLayer(42, testAnimation); //Add and save the animation container for later use.
                 ModifierLayer<IAnimation> testAnimation =  new ModifierLayer<>();
@@ -56,7 +55,7 @@ public class PlayerAnimTestmod implements ClientModInitializer {
         PlayerAnimationAccess.REGISTER_ANIMATION_EVENT.register((player, animationStack) -> {
             ModifierLayer<IAnimation> layer = new ModifierLayer<>();
             animationStack.addAnimLayer(69, layer);
-            PlayerAnimationAccess.getPlayerAssociatedData(player).set(new ResourceLocation("testmod", "test"), layer);
+            PlayerAnimationAccess.getPlayerAssociatedData(player).set(ResourceLocation.fromNamespaceAndPath("testmod", "test"), layer);
         });
         //You can add modifiers to the ModifierLayer.
 
@@ -69,9 +68,9 @@ public class PlayerAnimTestmod implements ClientModInitializer {
 
         ModifierLayer<IAnimation> testAnimation;
         if (new Random().nextBoolean()) {
-            testAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation("testmod", "animation"));
+            testAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(ResourceLocation.fromNamespaceAndPath("testmod", "animation"));
         } else {
-            testAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation("testmod", "test"));
+            testAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(ResourceLocation.fromNamespaceAndPath("testmod", "test"));
         }
 
         if (testAnimation.getAnimation() != null && new Random().nextBoolean()) {
@@ -81,7 +80,7 @@ public class PlayerAnimTestmod implements ClientModInitializer {
             //Fade from current animation to a new one.
             //Will not fade if there is no animation currently.
             testAnimation.replaceAnimationWithFade(AbstractFadeModifier.functionalFadeIn(20, (modelName, type, value) -> value),
-                    new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation("testmod", "two_handed_slash_vertical_right")))
+                    PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("testmod", "two_handed_slash_vertical_right")).playAnimation()
                             .setFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL)
                             .setFirstPersonConfiguration(new FirstPersonConfiguration().setShowRightArm(true).setShowLeftItem(false))
             );

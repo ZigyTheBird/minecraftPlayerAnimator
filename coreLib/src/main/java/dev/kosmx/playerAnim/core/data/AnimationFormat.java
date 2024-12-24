@@ -5,7 +5,11 @@ import java.util.Map;
 
 /**
  * Where is the emote from
+ * use dev.kosmx.playerAnim.minecraftApi.codec, AnimationCodecs class for deserializing instead.
+ * <p>
+ * This package may be removed in the future
  */
+@Deprecated
 public enum AnimationFormat {
     JSON_EMOTECRAFT("json"),
     JSON_MC_ANIM("json"),
@@ -27,6 +31,7 @@ public enum AnimationFormat {
         }
     }
 
+    @Deprecated(forRemoval = true)
     public static AnimationFormat byFileName(String fileName) {
         if (fileName == null || fileName.isEmpty())
             return AnimationFormat.UNKNOWN;
@@ -39,6 +44,10 @@ public enum AnimationFormat {
         return byExtension(fileName);
     }
 
+    /**
+     * use AnimationCodecs.deserialize() instead
+     */
+    @Deprecated(forRemoval = true)
     public static AnimationFormat byExtension(String extension) {
         if (extension == null || extension.isEmpty())
             return AnimationFormat.UNKNOWN;
@@ -48,10 +57,12 @@ public enum AnimationFormat {
 
     private final String extension;
 
+    @Deprecated(forRemoval = true)
     AnimationFormat(String extension) {
         this.extension = extension;
     }
 
+    @Deprecated(forRemoval = true)
     public String getExtension() {
         return extension;
     }
