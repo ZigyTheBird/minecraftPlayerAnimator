@@ -209,18 +209,19 @@ public class GeckoLibSerializer implements JsonDeserializer<List<KeyframeAnimati
 
     private static void readDataAtTick(JsonObject currentNode, KeyframeAnimation.StateCollection stateCollection, int tick, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
         Ease ease = Ease.LINEAR;
+        Float easingArg = null;
         if (currentNode.has("lerp_mode")) {
-            String lerp = currentNode.get("lerp_mode").getAsString();
-            ease = lerp.equals("catmullrom") ? Ease.INOUTSINE : Easing.easeFromString(lerp); //IDK what am I doing
+            ease = Easing.easeFromString(currentNode.get("lerp_mode").getAsString());
         }
         KeyframeAnimation.StateCollection.State[] targetVec = getTargetVec(stateCollection, type);
         if (currentNode.has("easing")) ease = Easing.easeFromString(currentNode.get("easing").getAsString());
+        if (currentNode.has("easingArgs")) easingArg = currentNode.getAsJsonArray("easingArgs").get(0).getAsFloat();
         if (currentNode.has("pre"))
-            readCollection(targetVec, tick, ease, getVector(currentNode.get("pre")), emoteData, type);
+            readCollection(targetVec, tick, ease, easingArg, getVector(currentNode.get("pre")), emoteData, type);
         if (currentNode.has("vector"))
-            readCollection(targetVec, tick, ease, currentNode.get("vector").getAsJsonArray(), emoteData, type);
+            readCollection(targetVec, tick, ease, easingArg, currentNode.get("vector").getAsJsonArray(), emoteData, type);
         if (currentNode.has("post"))
-            readCollection(targetVec, tick, ease, getVector(currentNode.get("post")), emoteData, type);
+            readCollection(targetVec, tick, ease, easingArg, getVector(currentNode.get("post")), emoteData, type);
     }
 
     public static JsonArray getVector(JsonElement element) {
