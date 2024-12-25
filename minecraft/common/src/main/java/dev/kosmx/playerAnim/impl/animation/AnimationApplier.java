@@ -46,4 +46,6 @@ public class AnimationApplier extends AnimationProcessor {
         }
     }
 
+    public static final @NotNull AnimationApplier EMPTY = new AnimationApplier(null);
+
 }

@@ -8,6 +8,7 @@ import dev.kosmx.playerAnim.core.util.SetableSupplier;
 import dev.kosmx.playerAnim.impl.Helper;
 import dev.kosmx.playerAnim.impl.IMutableModel;
 import dev.kosmx.playerAnim.impl.IUpperPartHelper;
+import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -32,8 +33,10 @@ public abstract class BipedEntityModelMixin<T extends HumanoidRenderState> exten
     @Final
     @Shadow
     public ModelPart leftArm;
+
     @Unique
-    private SetableSupplier<AnimationProcessor> playerAnimator$animation = new SetableSupplier<>(null);
+    @NotNull
+    private AnimationProcessor playerAnimator$animation = new AnimationApplier(null);
 
     private BipedEntityModelMixin(Void v, ModelPart modelPart) {
         super(modelPart);
@@ -53,21 +56,19 @@ public abstract class BipedEntityModelMixin<T extends HumanoidRenderState> exten
     }
 
     @Override
-    public void playerAnimator$setAnimationSupplier(SetableSupplier<AnimationProcessor> emoteSupplier){
+    public void playerAnimator$setAnimation(@NotNull AnimationProcessor emoteSupplier){
         this.playerAnimator$animation = emoteSupplier;
     }
 
     @Inject(method = "copyPropertiesTo", at = @At("RETURN"))
     private void copyMutatedAttributes(HumanoidModel<T> bipedEntityModel, CallbackInfo ci){
-        if(playerAnimator$animation != null) {
-            ((IMutableModel) bipedEntityModel).playerAnimator$setAnimationSupplier(playerAnimator$animation);
-        }
+        ((IMutableModel) bipedEntityModel).playerAnimator$setAnimation(playerAnimator$animation);
     }
 
     @Intrinsic(displace = true)
     @Override
     public void renderToBuffer(@NotNull PoseStack matrices, @NotNull VertexConsumer vertices, int light, int overlay, int color) {
-        if(Helper.isBendEnabled() && this.playerAnimator$animation.get() != null && this.playerAnimator$animation.get().isActive()){
+        if(Helper.isBendEnabled() && this.playerAnimator$animation.isActive()){
 
             this.allParts().forEach((part)->{
                 if(! ((IUpperPartHelper) part).playerAnimator$isUpperPart()){
@@ -75,9 +76,9 @@ public abstract class BipedEntityModelMixin<T extends HumanoidRenderState> exten
                 }
             });
 
-            SetableSupplier<AnimationProcessor> emoteSupplier = this.playerAnimator$animation;
+            AnimationProcessor emoteSupplier = this.playerAnimator$animation;
             matrices.pushPose();
-            IBendHelper.rotateMatrixStack(matrices, emoteSupplier.get().getBend(PartKey.BODY));
+            IBendHelper.rotateMatrixStack(matrices, emoteSupplier.getBend(PartKey.BODY));
             this.allParts().forEach((part)->{
                 if(((IUpperPartHelper) part).playerAnimator$isUpperPart()){
                     part.render(matrices, vertices, light, overlay, color);

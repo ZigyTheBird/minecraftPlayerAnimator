@@ -4,7 +4,6 @@ import dev.kosmx.playerAnim.impl.IPlayerAnimationState;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -12,6 +11,9 @@ import org.spongepowered.asm.mixin.Unique;
 public class PlayerRenderStateMixin implements IPlayerAnimationState {
     @Unique
     boolean playerAnimator$isLocalPlayer = false;
+
+    @Unique
+    boolean playerAnimator$isCameraEntity = false;
 
     @Unique
     AnimationApplier playerAnimator$animationApplier = new AnimationApplier(null);
@@ -24,6 +26,16 @@ public class PlayerRenderStateMixin implements IPlayerAnimationState {
     @Override
     public void playerAnimator$setLocalPlayer(boolean value) {
         playerAnimator$isLocalPlayer = value;
+    }
+
+    @Override
+    public boolean playerAnimator$isCameraEntity() {
+        return playerAnimator$isCameraEntity;
+    }
+
+    @Override
+    public void playerAnimator$setCameraEntity(boolean value) {
+        playerAnimator$isCameraEntity = value;
     }
 
     @Override
