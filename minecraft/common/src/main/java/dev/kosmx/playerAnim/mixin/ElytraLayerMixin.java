@@ -32,8 +32,14 @@ public abstract class ElytraLayerMixin<S extends HumanoidRenderState, M extends 
             if (emote.isActive()) {
                 Vec3f translation = emote.get3DTransform(PartKey.TORSO, TransformType.POSITION, Vec3f.ZERO);
                 Vec3f rotation = emote.get3DTransform(PartKey.TORSO, TransformType.ROTATION, Vec3f.ZERO);
+                translation = emote.get3DTransform(PartKey.CAPE, TransformType.POSITION, translation);
+                rotation = emote.get3DTransform(PartKey.CAPE, TransformType.ROTATION, rotation);
+                translation = emote.get3DTransform(PartKey.ELYTRA, TransformType.POSITION, translation);
+                rotation = emote.get3DTransform(PartKey.ELYTRA, TransformType.ROTATION, rotation);
                 poseStack.translate(translation.getX() / 16, translation.getY() / 16, translation.getZ() / 16);
                 poseStack.mulPose((new Quaternionf()).rotateXYZ(rotation.getX(), rotation.getY(), rotation.getZ()));
+                Vec3f scale = emote.get3DTransform(PartKey.ELYTRA, TransformType.SCALE, Vec3f.ONE);
+                poseStack.scale(scale.getX(), scale.getY(), scale.getZ());
                 IBendHelper.rotateMatrixStack(poseStack, emote.getBend(PartKey.TORSO));
             }
         }
