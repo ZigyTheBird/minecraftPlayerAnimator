@@ -46,6 +46,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
     @Intrinsic(displace = true)
     @Override
     public void render(@NotNull PlayerRenderState entityRenderState, @NotNull PoseStack poseStack, @NotNull MultiBufferSource multiBufferSource, int i) {
+        boolean hidden = false;
         if (FirstPersonMode.isFirstPersonPass() && entityRenderState instanceof IPlayerAnimationState state) {
             var animationApplier = state.playerAnimator$getAnimationApplier();
             var config = animationApplier.getFirstPersonConfiguration();
@@ -60,7 +61,13 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
                 this.model.rightSleeve.visible = showRightArm;
                 this.model.leftArm.visible = showLeftArm;
                 this.model.leftSleeve.visible = showLeftArm;
+                hidden = true;
             }
+        }
+        super.render(entityRenderState, poseStack, multiBufferSource, i);
+
+        if (hidden) {
+            playerAnimator$setAllPartsVisible(true); // reset visibility
         }
 
         // No `else` case needed to show parts, since the default state should be correct already
@@ -75,12 +82,13 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         this.model.rightArm.visible = visible;
         this.model.leftArm.visible = visible;
 
-        this.model.hat.visible = visible;
-        this.model.leftSleeve.visible = visible;
-        this.model.rightSleeve.visible = visible;
-        this.model.leftPants.visible = visible;
-        this.model.rightPants.visible = visible;
-        this.model.jacket.visible = visible;
+        // these are children of those ^^^
+        //this.model.hat.visible = visible;
+        //this.model.leftSleeve.visible = visible;
+        //this.model.rightSleeve.visible = visible;
+        //this.model.leftPants.visible = visible;
+        //this.model.rightPants.visible = visible;
+        //this.model.jacket.visible = visible;
     }
 
 

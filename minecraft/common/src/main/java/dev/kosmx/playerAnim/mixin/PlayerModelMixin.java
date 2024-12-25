@@ -111,6 +111,11 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<Play
     private void setDefaultBeforeRender(PlayerRenderState playerRenderState, CallbackInfo ci){
         setDefaultPivot(); //to not make everything wrong
 
+    }
+
+    @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "RETURN"))
+    private void setupPlayerAnimation(PlayerRenderState playerRenderState, CallbackInfo ci) {
+
         if(!firstPersonNext && playerRenderState instanceof IPlayerAnimationState state && state.playerAnimator$getAnimationApplier().isActive()){
             AnimationApplier emote = state.playerAnimator$getAnimationApplier();
             ((IMutableModel)this).playerAnimator$setAnimation(emote);
@@ -118,9 +123,9 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<Play
             emote.updatePart(PartKey.HEAD, this.head);
             this.hat.copyFrom(this.head);
 
-            emote.updatePart(PartKey.RIGHT_ARM, this.rightLeg);
+            emote.updatePart(PartKey.RIGHT_ARM, this.rightArm);
             emote.updatePart(PartKey.LEFT_ARM, this.leftArm);
-            emote.updatePart(PartKey.RIGHT_LEG, this.rightArm);
+            emote.updatePart(PartKey.RIGHT_LEG, this.rightLeg);
             emote.updatePart(PartKey.LEFT_LEG, this.leftLeg);
             emote.updatePart(PartKey.TORSO, this.body);
         }
