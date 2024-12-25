@@ -40,6 +40,7 @@ public class PartKey {
     public static final @NotNull PartKey RIGHT_ITEM = keyForId("rightItem");
     public static final @NotNull PartKey LEFT_ITEM = keyForId("leftItem");
     public static final @NotNull PartKey CAPE = keyForId("cape");
+    public static final @NotNull PartKey ELYTRA = keyForId("elytra");
 
 
     /**
