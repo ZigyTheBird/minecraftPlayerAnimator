@@ -26,7 +26,7 @@ public class LivingEntityRendererMixin {
             method = "render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
             at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;layers:Ljava/util/List;", opcode = Opcodes.GETFIELD))
     private List<Object> filterLayers(LivingEntityRenderer instance, LivingEntityRenderState entityRenderState, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
-        if (((IPlayerAnimationState) entityRenderState).playerAnimator$isLocalPlayer() && FirstPersonMode.isFirstPersonPass()) {
+        if (entityRenderState instanceof IPlayerAnimationState state && state.playerAnimator$isLocalPlayer() && FirstPersonMode.isFirstPersonPass()) {
             return layers.stream().filter(layer -> layer instanceof PlayerItemInHandLayer).toList();
         } else return layers;
     }
