@@ -15,7 +15,6 @@
     "LivingEntityRenderRedirect_bendOnly",
     "ModelPartMixin",
     "PlayerEntityMixin",
-    "PlayerModelAccessor",
     "PlayerModelMixin",
     "PlayerRendererMixin",
     "PlayerRenderStateMixin",
