@@ -2,7 +2,6 @@ package dev.kosmx.playerAnim.impl;
 
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Extension of PlayerRenderState

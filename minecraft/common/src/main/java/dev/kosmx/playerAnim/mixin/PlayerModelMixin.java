@@ -1,7 +1,10 @@
 package dev.kosmx.playerAnim.mixin;
 
 import dev.kosmx.playerAnim.api.PartKey;
-import dev.kosmx.playerAnim.impl.*;
+import dev.kosmx.playerAnim.impl.IMutableModel;
+import dev.kosmx.playerAnim.impl.IPlayerAnimationState;
+import dev.kosmx.playerAnim.impl.IPlayerModel;
+import dev.kosmx.playerAnim.impl.IUpperPartHelper;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.HumanoidModel;

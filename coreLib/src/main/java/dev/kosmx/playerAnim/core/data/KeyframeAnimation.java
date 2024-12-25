@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Used to store Emote data
