@@ -1,72 +1,40 @@
 package dev.kosmx.playerAnim.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.kosmx.playerAnim.api.PartKey;
 import dev.kosmx.playerAnim.impl.Helper;
-import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
+import dev.kosmx.playerAnim.impl.IPlayerAnimationState;
 import dev.kosmx.playerAnim.impl.IUpperPartHelper;
 import dev.kosmx.playerAnim.impl.animation.IBendHelper;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
- * Compatibility issue: can not redirect {@link RenderLayer#render(PoseStack, MultiBufferSource, int, Entity, float, float, float, float, float, float)}
- * I have to modify the matrixStack and do not forget to POP it!
- * <p>
- * I can inject into the enhanced for
- * {@link List#iterator()}      //initial push to keep in sync
- * {@link Iterator#hasNext()}   //to pop the matrix stack
- * {@link Iterator#next()}      //I can see the modelPart, decide if I need to manipulate it. But push always
- *
- * @param <T>
- * @param <M>
+ * use MixinExtras instead :)
+ * high priority
  */
-@Mixin(LivingEntityRenderer.class)
-public abstract class LivingEntityRenderRedirect_bendOnly<T extends Entity, M extends EntityModel<T>> extends EntityRenderer<T> implements RenderLayerParent<T, M> {
+@Mixin(value = LivingEntityRenderer.class, priority = 100)
+public abstract class LivingEntityRenderRedirect_bendOnly {
 
-    protected LivingEntityRenderRedirect_bendOnly(EntityRendererProvider.Context context) {
-        super(context);
-    }
-
-    @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-        at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
-    private void initialPush(LivingEntity livingEntity, float f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci){
-        if (Helper.isBendEnabled()) poseStack.pushPose();
-    }
-
-    @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-        at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z"))
-    private void popMatrixStack(LivingEntity livingEntity, float f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci){
-        if (Helper.isBendEnabled()) poseStack.popPose();
-    }
-
-    @Redirect(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-        at = @At(value = "INVOKE", target = "Ljava/util/Iterator;next()Ljava/lang/Object;"))
-    private Object transformMatrixStack(Iterator<RenderLayer<T, M>> instance, LivingEntity livingEntity, float f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, int i){
-        if (Helper.isBendEnabled()) {
+    @WrapOperation(method = "render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/RenderLayer;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/state/EntityRenderState;FF)V"))
+    private void wrapRender(RenderLayer<?, ?> layer, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, EntityRenderState entityRenderState, float f, float g, Operation<Void> original) {
+        if (Helper.isBendEnabled() && entityRenderState instanceof IPlayerAnimationState state && state.playerAnimator$getAnimationApplier().isActive() && ((IUpperPartHelper) layer).playerAnimator$isUpperPart()) {
             poseStack.pushPose();
-            RenderLayer<T, M> layer = instance.next();
-            if (livingEntity instanceof Player && livingEntity instanceof IAnimatedPlayer && ((IAnimatedPlayer) livingEntity).playerAnimator_getAnimation().isActive() && ((IUpperPartHelper) layer).playerAnimator$isUpperPart()) {
-                IBendHelper.rotateMatrixStack(poseStack, ((IAnimatedPlayer) livingEntity).playerAnimator_getAnimation().getBend("body"));
-            }
-            return layer;
+            IBendHelper.rotateMatrixStack(poseStack, state.playerAnimator$getAnimationApplier().getBend(PartKey.BODY));
+
+            original.call(layer, poseStack, multiBufferSource, i, entityRenderState, f, g);
+
+            poseStack.popPose();
         } else {
-            return instance.next();
+            original.call(layer, poseStack, multiBufferSource, i, entityRenderState, f, g);
         }
     }
+
+
 }

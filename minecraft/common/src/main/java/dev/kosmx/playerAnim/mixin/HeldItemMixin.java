@@ -30,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemInHandLayer.class)
 public class HeldItemMixin {
 
-    //TODO where to put it exactly
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;mulPose(Lorg/joml/Quaternionf;)V", ordinal = 0))
     private void renderMixin(LivingEntityRenderState renderState, @Nullable BakedModel bakedModel, ItemStack itemStack, ItemDisplayContext itemDisplayContext, HumanoidArm arm, PoseStack matrices, MultiBufferSource multiBufferSource, int i, CallbackInfo ci){
         if(Helper.isBendEnabled() && renderState instanceof IPlayerAnimationState state){
@@ -54,17 +53,17 @@ public class HeldItemMixin {
         }
     }
 
-    @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
-    private void changeItemLocation(LivingEntity livingEntity, ItemStack itemStack, ItemDisplayContext itemDisplayContext, HumanoidArm arm, PoseStack matrices, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
-        if(livingEntity instanceof IAnimatedPlayer player) {
-            if (player.playerAnimator_getAnimation().isActive()) {
-                AnimationProcessor anim = player.playerAnimator_getAnimation();
+    @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V"))
+    private void changeItemLocation(LivingEntityRenderState renderState, @Nullable BakedModel bakedModel, ItemStack itemStack, ItemDisplayContext itemDisplayContext, HumanoidArm arm, PoseStack matrices, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
+        if(renderState instanceof IPlayerAnimationState state) {
+            if (state.playerAnimator$getAnimationApplier().isActive()) {
+                AnimationProcessor anim = state.playerAnimator$getAnimationApplier();
 
-                Vec3f scale = anim.get3DTransform(arm == HumanoidArm.LEFT ? "leftItem" : "rightItem", TransformType.SCALE,
+                Vec3f scale = anim.get3DTransform(arm == HumanoidArm.LEFT ? PartKey.LEFT_ITEM : PartKey.RIGHT_ITEM, TransformType.SCALE,
                         new Vec3f(ModelPart.DEFAULT_SCALE, ModelPart.DEFAULT_SCALE, ModelPart.DEFAULT_SCALE)
                 );
-                Vec3f rot = anim.get3DTransform(arm == HumanoidArm.LEFT ? "leftItem" : "rightItem", TransformType.ROTATION, Vec3f.ZERO);
-                Vec3f pos = anim.get3DTransform(arm == HumanoidArm.LEFT ? "leftItem" : "rightItem", TransformType.POSITION, Vec3f.ZERO).scale(1/16f);
+                Vec3f rot = anim.get3DTransform(arm == HumanoidArm.LEFT ? PartKey.LEFT_ITEM : PartKey.RIGHT_ITEM, TransformType.ROTATION, Vec3f.ZERO);
+                Vec3f pos = anim.get3DTransform(arm == HumanoidArm.LEFT ? PartKey.LEFT_ITEM : PartKey.RIGHT_ITEM, TransformType.POSITION, Vec3f.ZERO).scale(1/16f);
 
                 matrices.scale(scale.getX(), scale.getY(), scale.getZ());
                 matrices.translate(pos.getX(), pos.getY(), pos.getZ());

@@ -13,6 +13,9 @@ public interface IPlayerAnimationState {
     boolean playerAnimator$isLocalPlayer();
     void playerAnimator$setLocalPlayer(boolean value);
 
+    boolean playerAnimator$isCameraEntity();
+    void playerAnimator$setCameraEntity(boolean value);
+
     // AnimationApplier animationApplier
     void playerAnimator$setAnimationApplier(AnimationApplier value);
     @NotNull AnimationApplier playerAnimator$getAnimationApplier();
