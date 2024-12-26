@@ -6,7 +6,6 @@ import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IPlayerAnimationState;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
-import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -40,7 +39,6 @@ public abstract class ElytraLayerMixin<S extends HumanoidRenderState, M extends 
                 poseStack.mulPose((new Quaternionf()).rotateXYZ(rotation.getX(), rotation.getY(), rotation.getZ()));
                 Vec3f scale = emote.get3DTransform(PartKey.ELYTRA, TransformType.SCALE, Vec3f.ONE);
                 poseStack.scale(scale.getX(), scale.getY(), scale.getZ());
-                IBendHelper.rotateMatrixStack(poseStack, emote.getBend(PartKey.TORSO));
             }
         }
     }

@@ -6,11 +6,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev.kosmx.playerAnim.api.PartKey;
 import dev.kosmx.playerAnim.api.TransformType;
-import dev.kosmx.playerAnim.core.util.Pair;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IPlayerAnimationState;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
-import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -27,7 +25,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Objects;
 
 @Mixin(CapeLayer.class)
 public abstract class CapeLayerMixin extends RenderLayer<PlayerRenderState, PlayerModel> {
@@ -44,13 +41,10 @@ public abstract class CapeLayerMixin extends RenderLayer<PlayerRenderState, Play
         if (model instanceof CapeLayerAccessor capeLayer) {
             if (emote.isActive()) {
                 ModelPart torso = this.getParentModel().body;
-                Pair<Float, Float> torsoBend = emote.getBend(PartKey.TORSO);
-                Pair<Float, Float> bodyBend = emote.getBend(PartKey.BODY);
-                bodyBend = new Pair<>(torsoBend.getLeft() + bodyBend.getLeft(), torsoBend.getRight() + bodyBend.getRight());
 
                 poseStack.translate(torso.x / 16, torso.y / 16, torso.z / 16);
                 poseStack.mulPose((new Quaternionf()).rotateXYZ(torso.xRot, torso.yRot, torso.zRot));
-                IBendHelper.rotateMatrixStack(poseStack, torsoBend);
+
                 poseStack.translate(0.0F, 0.0F, 0.125F);
                 poseStack.mulPose(Axis.YP.rotationDegrees(180));
 
@@ -58,9 +52,6 @@ public abstract class CapeLayerMixin extends RenderLayer<PlayerRenderState, Play
                 Vec3f transform = emote.get3DTransform(PartKey.CAPE, TransformType.POSITION, Vec3f.ZERO);
                 Vec3f rotation = emote.get3DTransform(PartKey.CAPE, TransformType.ROTATION, Vec3f.ZERO);
                 Vec3f scale = emote.get3DTransform(PartKey.CAPE, TransformType.SCALE, Vec3f.ONE);
-                Pair<Float, Float> bend = emote.getBend(PartKey.CAPE);
-                if (Objects.equals(bend.getRight(), bend.getLeft()) && bend.getLeft() == 0)
-                    bend = bodyBend;
 
                 cape.x = transform.getX();
                 cape.y = transform.getY();
@@ -72,9 +63,6 @@ public abstract class CapeLayerMixin extends RenderLayer<PlayerRenderState, Play
                 cape.yScale = scale.getY();
                 cape.zScale = scale.getZ();
 
-                IBendHelper.INSTANCE.bend(cape, bend);
-            } else {
-                IBendHelper.INSTANCE.bend(capeLayer.getCape(), null);
             }
         }
     }

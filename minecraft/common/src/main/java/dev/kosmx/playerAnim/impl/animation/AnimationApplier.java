@@ -6,7 +6,6 @@ import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.core.impl.AnimationProcessor;
 import dev.kosmx.playerAnim.core.util.MathHelper;
-import dev.kosmx.playerAnim.core.util.Pair;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import net.minecraft.client.model.geom.ModelPart;
 import org.jetbrains.annotations.ApiStatus;
@@ -35,15 +34,6 @@ public class AnimationApplier extends AnimationProcessor {
         part.xScale = scale.getX();
         part.yScale = scale.getY();
         part.zScale = scale.getZ();
-        if (partKey != PartKey.HEAD) {
-            if (partKey == PartKey.TORSO) {
-                Pair<Float, Float> torsoBend = getBend(partKey);
-                Pair<Float, Float> bodyBend = getBend(PartKey.BODY);
-                IBendHelper.INSTANCE.bend(part, new Pair<>(torsoBend.getLeft() + bodyBend.getLeft(), torsoBend.getRight() + bodyBend.getRight()));
-            } else {
-                IBendHelper.INSTANCE.bend(part, getBend(partKey));
-            }
-        }
     }
 
     public static final @NotNull AnimationApplier EMPTY = new AnimationApplier(null);

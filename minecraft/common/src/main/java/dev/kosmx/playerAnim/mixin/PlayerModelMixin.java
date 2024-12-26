@@ -4,15 +4,12 @@ import dev.kosmx.playerAnim.api.PartKey;
 import dev.kosmx.playerAnim.impl.IMutableModel;
 import dev.kosmx.playerAnim.impl.IPlayerAnimationState;
 import dev.kosmx.playerAnim.impl.IPlayerModel;
-import dev.kosmx.playerAnim.impl.IUpperPartHelper;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
-import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Final;
@@ -45,28 +42,8 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<Play
         super(modelPart, function);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void initBendableStuff(ModelPart modelPart, boolean bl, CallbackInfo ci){
-        IMutableModel thisWithMixin = (IMutableModel) this;
-
-        addBendMutator(this.jacket, Direction.DOWN);
-        addBendMutator(this.rightPants, Direction.UP);
-        addBendMutator(this.rightSleeve, Direction.UP);
-        addBendMutator(this.leftPants, Direction.UP);
-        addBendMutator(this.leftSleeve, Direction.UP);
-        // IBendHelper.INSTANCE.initCapeBend(this.cloak);
-
-        ((IUpperPartHelper)rightSleeve).playerAnimator$setUpperPart(true);
-        ((IUpperPartHelper)leftSleeve).playerAnimator$setUpperPart(true);
-    }
-
     @Unique
-    private void addBendMutator(ModelPart part, Direction d){
-        IBendHelper.INSTANCE.initBend(part, d);
-    }
-
-    @Unique
-    private void setDefaultPivot(){
+    private void playerAnimator$setDefaultPivot(){
         this.leftLeg.setPos(1.9F, 12.0F, 0.0F);
         this.rightLeg.setPos(- 1.9F, 12.0F, 0.0F);
         this.head.setPos(0.0F, 0.0F, 0.0F);
@@ -109,7 +86,7 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<Play
 
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "HEAD"))
     private void setDefaultBeforeRender(PlayerRenderState playerRenderState, CallbackInfo ci){
-        setDefaultPivot(); //to not make everything wrong
+        playerAnimator$setDefaultPivot(); //to not make everything wrong
 
     }
 
@@ -132,18 +109,7 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<Play
         else {
             firstPersonNext = false;
             ((IMutableModel)this).playerAnimator$setAnimation(AnimationApplier.EMPTY);
-            resetBend(this.body);
-            resetBend(this.leftArm);
-            resetBend(this.rightArm);
-            resetBend(this.leftLeg);
-            resetBend(this.rightLeg);
         }
-    }
-
-
-    @Unique
-    private static void resetBend(ModelPart part) {
-        IBendHelper.INSTANCE.bend(part, null);
     }
 
     /**
