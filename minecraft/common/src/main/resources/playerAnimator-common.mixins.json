@@ -12,7 +12,6 @@
     "ElytraLayerMixin",
     "FeatureRendererMixin",
     "HeldItemMixin",
-    "LivingEntityRenderRedirect_bendOnly",
     "ModelPartMixin",
     "PlayerEntityMixin",
     "PlayerModelMixin",
