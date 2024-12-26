@@ -246,6 +246,8 @@ public class GeckoLibSerializer implements JsonDeserializer<List<KeyframeAnimati
                     }
                 }
                 value += a[i].defaultValue;
+                if (type != TransformType.SCALE)
+                    value += a[i].defaultValue;
                 a[i].addKeyFrame(tick, value, ease, 0, true);
             }
         }
