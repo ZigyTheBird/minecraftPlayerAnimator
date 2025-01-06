@@ -85,10 +85,9 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<Play
         this.leftLeg.zScale = ModelPart.DEFAULT_SCALE;
     }
 
-    @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "HEAD"))
     private void setDefaultBeforeRender(PlayerRenderState playerRenderState, CallbackInfo ci){
         playerAnimator$setDefaultPivot(); //to not make everything wrong
-        
     }
 
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "RETURN"))
