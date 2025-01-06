@@ -1,6 +1,7 @@
 package dev.kosmx.playerAnim.mixin;
 
 import dev.kosmx.playerAnim.api.PartKey;
+import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
 import dev.kosmx.playerAnim.impl.IMutableModel;
 import dev.kosmx.playerAnim.impl.IPlayerAnimationState;
 import dev.kosmx.playerAnim.impl.IPlayerModel;
@@ -84,15 +85,14 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<Play
         this.leftLeg.zScale = ModelPart.DEFAULT_SCALE;
     }
 
-    @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "HEAD"))
+    @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "HEAD"), cancellable = true)
     private void setDefaultBeforeRender(PlayerRenderState playerRenderState, CallbackInfo ci){
         playerAnimator$setDefaultPivot(); //to not make everything wrong
-
+        
     }
 
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At(value = "RETURN"))
     private void setupPlayerAnimation(PlayerRenderState playerRenderState, CallbackInfo ci) {
-
         if(!firstPersonNext && playerRenderState instanceof IPlayerAnimationState state && state.playerAnimator$getAnimationApplier().isActive()){
             AnimationApplier emote = state.playerAnimator$getAnimationApplier();
             ((IMutableModel)this).playerAnimator$setAnimation(emote);
@@ -110,6 +110,38 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<Play
             firstPersonNext = false;
             ((IMutableModel)this).playerAnimator$setAnimation(AnimationApplier.EMPTY);
         }
+
+        if (FirstPersonMode.isFirstPersonPass() && playerRenderState instanceof IPlayerAnimationState state
+                && state.playerAnimator$isCameraEntity()) {
+            var config = state.playerAnimator$getAnimationApplier().getFirstPersonConfiguration();
+            // Hiding all parts, because they should not be visible in first person
+            playerAnimator$setAllPartsVisible(false);
+            // Showing arms based on configuration
+            var showRightArm = config.isShowRightArm();
+            var showLeftArm = config.isShowLeftArm();
+            this.rightArm.visible = showRightArm;
+            this.rightSleeve.visible = showRightArm;
+            this.leftArm.visible = showLeftArm;
+            this.leftSleeve.visible = showLeftArm;
+        }
+    }
+
+    @Unique
+    private void playerAnimator$setAllPartsVisible(boolean visible) {
+        this.head.visible = visible;
+        this.body.visible = visible;
+        this.leftLeg.visible = visible;
+        this.rightLeg.visible = visible;
+        this.rightArm.visible = visible;
+        this.leftArm.visible = visible;
+
+        // these are children of those ^^^
+        //this.hat.visible = visible;
+        //this.leftSleeve.visible = visible;
+        //this.rightSleeve.visible = visible;
+        //this.leftPants.visible = visible;
+        //this.rightPants.visible = visible;
+        //this.jacket.visible = visible;
     }
 
     /**

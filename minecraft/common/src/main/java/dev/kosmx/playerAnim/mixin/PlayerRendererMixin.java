@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev.kosmx.playerAnim.api.PartKey;
 import dev.kosmx.playerAnim.api.TransformType;
-import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.IPlayerAnimationState;
@@ -13,15 +12,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
-import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -43,55 +38,6 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         ((IPlayerAnimationState)playerRenderState).playerAnimator$setLocalPlayer(abstractClientPlayer == Minecraft.getInstance().cameraEntity);
     }
 
-    @Intrinsic(displace = true)
-    @Override
-    public void render(@NotNull PlayerRenderState entityRenderState, @NotNull PoseStack poseStack, @NotNull MultiBufferSource multiBufferSource, int i) {
-        boolean hidden = false;
-        if (FirstPersonMode.isFirstPersonPass() && entityRenderState instanceof IPlayerAnimationState state) {
-            var animationApplier = state.playerAnimator$getAnimationApplier();
-            var config = animationApplier.getFirstPersonConfiguration();
-
-            if (state.playerAnimator$isCameraEntity()) {
-                // Hiding all parts, because they should not be visible in first person
-                playerAnimator$setAllPartsVisible(false);
-                // Showing arms based on configuration
-                var showRightArm = config.isShowRightArm();
-                var showLeftArm = config.isShowLeftArm();
-                this.model.rightArm.visible = showRightArm;
-                this.model.rightSleeve.visible = showRightArm;
-                this.model.leftArm.visible = showLeftArm;
-                this.model.leftSleeve.visible = showLeftArm;
-                hidden = true;
-            }
-        }
-        super.render(entityRenderState, poseStack, multiBufferSource, i);
-
-        if (hidden) {
-            playerAnimator$setAllPartsVisible(true); // reset visibility
-        }
-
-        // No `else` case needed to show parts, since the default state should be correct already
-    }
-
-    @Unique
-    private void playerAnimator$setAllPartsVisible(boolean visible) {
-        this.model.head.visible = visible;
-        this.model.body.visible = visible;
-        this.model.leftLeg.visible = visible;
-        this.model.rightLeg.visible = visible;
-        this.model.rightArm.visible = visible;
-        this.model.leftArm.visible = visible;
-
-        // these are children of those ^^^
-        //this.model.hat.visible = visible;
-        //this.model.leftSleeve.visible = visible;
-        //this.model.rightSleeve.visible = visible;
-        //this.model.leftPants.visible = visible;
-        //this.model.rightPants.visible = visible;
-        //this.model.jacket.visible = visible;
-    }
-
-
     @Inject(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At("RETURN"))
     private void applyBodyTransforms(PlayerRenderState playerRenderState, PoseStack matrixStack, float f, float g, CallbackInfo ci){
         var animationPlayer = ((IPlayerAnimationState) playerRenderState).playerAnimator$getAnimationApplier();
@@ -110,5 +56,10 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
             matrixStack.mulPose(Axis.XP.rotation(vec3f.getX()));    //yaw
             matrixStack.translate(0, - 0.7d, 0);
         }
+    }
+
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;F)V", at = @At("TAIL"))
+    private void extractRenderState(AbstractClientPlayer abstractClientPlayer, PlayerRenderState playerRenderState, float f, CallbackInfo ci) {
+        ((IPlayerAnimationState)playerRenderState).playerAnimator$setCameraEntity(abstractClientPlayer == Minecraft.getInstance().cameraEntity);
     }
 }
