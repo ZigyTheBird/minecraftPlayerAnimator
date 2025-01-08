@@ -12,6 +12,7 @@
     "ElytraLayerMixin",
     "FeatureRendererMixin",
     "HeldItemMixin",
+    "LivingEntityRendererMixin",
     "ModelPartMixin",
     "PlayerEntityMixin",
     "PlayerModelMixin",
