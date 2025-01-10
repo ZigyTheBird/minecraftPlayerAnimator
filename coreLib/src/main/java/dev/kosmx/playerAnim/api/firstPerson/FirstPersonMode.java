@@ -20,11 +20,16 @@ public enum FirstPersonMode {
     THIRD_PERSON_MODEL(true),
 
     /**
+     * Use the 3rd person player model (only arms/items/shoulder armor) to render accurate first-person perspective
+     */
+    THIRD_PERSON_MODEL_SP(true),
+
+    /**
      * First person animation is DISABLED, vanilla idle will be active.
      */
     DISABLED(false),
 
-;
+    ;
     @Getter
     private final boolean enabled;
 
@@ -32,7 +37,6 @@ public enum FirstPersonMode {
     FirstPersonMode(boolean enabled) {
         this.enabled = enabled;
     }
-
 
 
     private static final ThreadLocal<Boolean> firstPersonPass = ThreadLocal.withInitial(() -> false);
