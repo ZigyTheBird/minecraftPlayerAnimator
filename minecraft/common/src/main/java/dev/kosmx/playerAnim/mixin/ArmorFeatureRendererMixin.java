@@ -1,10 +1,16 @@
 package dev.kosmx.playerAnim.mixin;
 
+import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
+import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.IUpperPartHelper;
+import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,10 +18,47 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HumanoidArmorLayer.class)
-public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> {
+public abstract class ArmorFeatureRendererMixin<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> extends RenderLayer<T, M> {
+
+    protected ArmorFeatureRendererMixin(RenderLayerParent<T, M> renderLayerParent) {
+        super(renderLayerParent);
+    }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initInject(RenderLayerParent<T, M> context, A leggingsModel, A bodyModel, ModelManager modelManager, CallbackInfo ci){
         ((IUpperPartHelper)this).setUpperPart(false);
+    }
+
+    @Inject(
+            method = "setPartVisibility",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void modifyArmorVisibility(A humanoidModel, EquipmentSlot equipmentSlot, CallbackInfo ci) {
+        AnimationApplier emote = ((IAnimatedPlayer) Minecraft.getInstance().player).playerAnimator_getAnimation();
+        if (emote.isActive() && emote.getFirstPersonMode() == FirstPersonMode.THIRD_PERSON_MODEL_SP && FirstPersonMode.isFirstPersonPass()) {
+            humanoidModel.setAllVisible(false);
+
+            switch (equipmentSlot) {
+                case CHEST:
+                    if (emote.getFirstPersonConfiguration().isShowRightArm()) {
+                        humanoidModel.rightArm.visible = true;
+                    }
+                    if (emote.getFirstPersonConfiguration().isShowLeftArm()) {
+                        humanoidModel.leftArm.visible = true;
+                    }
+                    humanoidModel.body.visible = false;
+                    break;
+                case HEAD:
+                    humanoidModel.head.visible = true;
+                    humanoidModel.hat.visible = true;
+                    break;
+                case LEGS, FEET:
+                    humanoidModel.rightLeg.visible = true;
+                    humanoidModel.leftLeg.visible = true;
+                    break;
+            }
+            ci.cancel();
+        }
     }
 }
