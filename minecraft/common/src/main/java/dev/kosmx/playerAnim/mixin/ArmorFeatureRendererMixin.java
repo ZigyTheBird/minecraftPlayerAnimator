@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static net.minecraft.world.entity.EquipmentSlot.CHEST;
+
 @Mixin(HumanoidArmorLayer.class)
 public abstract class ArmorFeatureRendererMixin<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> extends RenderLayer<T, M> {
 
@@ -38,25 +40,14 @@ public abstract class ArmorFeatureRendererMixin<T extends LivingEntity, M extend
         AnimationApplier emote = ((IAnimatedPlayer) Minecraft.getInstance().player).playerAnimator_getAnimation();
         if (emote.isActive() && emote.getFirstPersonMode() == FirstPersonMode.THIRD_PERSON_MODEL_SP && FirstPersonMode.isFirstPersonPass()) {
             humanoidModel.setAllVisible(false);
-
-            switch (equipmentSlot) {
-                case CHEST:
-                    if (emote.getFirstPersonConfiguration().isShowRightArm()) {
-                        humanoidModel.rightArm.visible = true;
-                    }
-                    if (emote.getFirstPersonConfiguration().isShowLeftArm()) {
-                        humanoidModel.leftArm.visible = true;
-                    }
-                    humanoidModel.body.visible = false;
-                    break;
-                case HEAD:
-                    humanoidModel.head.visible = true;
-                    humanoidModel.hat.visible = true;
-                    break;
-                case LEGS, FEET:
-                    humanoidModel.rightLeg.visible = true;
-                    humanoidModel.leftLeg.visible = true;
-                    break;
+            if (equipmentSlot == CHEST){
+                if (emote.getFirstPersonConfiguration().isShowRightArm()) {
+                    humanoidModel.rightArm.visible = true;
+                }
+                if (emote.getFirstPersonConfiguration().isShowLeftArm()) {
+                    humanoidModel.leftArm.visible = true;
+                }
+                humanoidModel.body.visible = false;
             }
             ci.cancel();
         }
