@@ -27,8 +27,8 @@ public abstract class ArmorFeatureRendererMixin<T extends LivingEntity, M extend
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void initInject(RenderLayerParent<T, M> context, A leggingsModel, A bodyModel, ModelManager modelManager, CallbackInfo ci){
-        ((IUpperPartHelper)this).setUpperPart(false);
+    private void initInject(RenderLayerParent<T, M> context, A leggingsModel, A bodyModel, ModelManager modelManager, CallbackInfo ci) {
+        ((IUpperPartHelper) this).setUpperPart(false);
     }
 
     @Inject(
@@ -40,13 +40,9 @@ public abstract class ArmorFeatureRendererMixin<T extends LivingEntity, M extend
         AnimationApplier emote = ((IAnimatedPlayer) Minecraft.getInstance().player).playerAnimator_getAnimation();
         if (emote.isActive() && emote.getFirstPersonMode() == FirstPersonMode.THIRD_PERSON_MODEL_SP && FirstPersonMode.isFirstPersonPass()) {
             humanoidModel.setAllVisible(false);
-            if (equipmentSlot == CHEST){
-                if (emote.getFirstPersonConfiguration().isShowRightArm()) {
-                    humanoidModel.rightArm.visible = true;
-                }
-                if (emote.getFirstPersonConfiguration().isShowLeftArm()) {
-                    humanoidModel.leftArm.visible = true;
-                }
+            if (equipmentSlot == CHEST) {
+                humanoidModel.rightArm.visible = emote.getFirstPersonConfiguration().isShowRightArm();
+                humanoidModel.leftArm.visible = emote.getFirstPersonConfiguration().isShowLeftArm();
                 humanoidModel.body.visible = false;
             }
             ci.cancel();
