@@ -115,6 +115,17 @@ public class ItemMixin {
 
                 //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
             }
+            if (itemStack.getItem().equals(Items.SAND)) {
+                //If we want to play the animation, get the animation container
+                var animationContainer = ((IExampleAnimatedPlayer) player).modid_getModAnimation();
+
+                //Use setAnimation to set the current animation. It will be played automatically.
+                KeyframeAnimation anim = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("player-animator", "walking_animation"));
+
+                animationContainer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(5, Ease.INOUTSINE), new KeyframeAnimationPlayer(anim));
+
+                //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
+            }
         }
     }
 }
