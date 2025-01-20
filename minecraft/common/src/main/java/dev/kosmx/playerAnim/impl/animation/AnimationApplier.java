@@ -12,7 +12,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@ApiStatus.Internal
 public class AnimationApplier extends AnimationProcessor {
     public AnimationApplier(@Nullable IAnimation animation) {
         super(animation);
@@ -37,5 +36,4 @@ public class AnimationApplier extends AnimationProcessor {
     }
 
     public static final @NotNull AnimationApplier EMPTY = new AnimationApplier(null);
-
 }
