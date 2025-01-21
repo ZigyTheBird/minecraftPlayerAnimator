@@ -14,4 +14,5 @@ public class FirstPersonConfiguration {
     boolean showLeftArm = false;
     boolean showRightItem = true;
     boolean showLeftItem = true;
+    boolean showArmor = false;
 }
