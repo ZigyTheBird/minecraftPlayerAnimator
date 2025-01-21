@@ -16,12 +16,15 @@ import java.util.Map;
  * Usage: Instead of comparing for a string key, store a static final PartKey for the given part in your class, and compare (key) for that.
  * <br>
  * Common part static keys are also available in this class, but you can request your own.
- *
- * @apiNote
+ * <p>
+ * API note
+ * <br>
  * If two PartKey objects are different, their key must be different: instance comparison is safe for part key equality check.
  * partKeyA == partKeyB is completely safe and okay to do.
- *
- * @implNote Please be aware that with Project Valhalla, the implementation of this class may change, but the behaviour and public functions must not.
+ * <p>
+ * Implementation note
+ * <br>
+ * Please be aware that with Project Valhalla, the implementation of this class may change, but the behaviour and public functions must not.
  *
  */
 @Getter

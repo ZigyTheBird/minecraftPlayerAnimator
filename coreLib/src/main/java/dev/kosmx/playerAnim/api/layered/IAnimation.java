@@ -45,13 +45,14 @@ public interface IAnimation {
 
     /**
      * Get the transformed value to a model part, transform type.
+     * <p>
+     * API note <br>
+     * DO NOT CALL super.get3DTransform() as the default implementation will be removed.
      * @param modelKey The questionable model part
      * @param type      Transform type
      * @param tickDelta Time since the last tick. 0-1
      * @param value0    The value before the transform. For identity transform return with it.
      * @return The new transform value
-     *
-     * @apiNote DO NOT CALL super.get3DTransform() as the default implementation will be removed.
      */
     default @NotNull Vec3f get3DTransform(@NotNull PartKey modelKey, @NotNull TransformType type, float tickDelta, @NotNull Vec3f value0) {
         return get3DTransform(modelKey.getKey(), type, tickDelta, value0);
