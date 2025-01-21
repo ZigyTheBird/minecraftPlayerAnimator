@@ -5,6 +5,7 @@ import dev.kosmx.playerAnim.api.PartKey;
 import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
+import dev.kosmx.playerAnim.api.layered.AnimationStack;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.core.util.Pair;
 import dev.kosmx.playerAnim.core.util.Vec3f;
@@ -14,9 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Tool to easily play animation to the player.
- * internal, do not use
  */
-@ApiStatus.Internal
 public class AnimationProcessor {
     @Nullable
     private final IAnimation animation;
@@ -26,6 +25,7 @@ public class AnimationProcessor {
         this.animation = animation;
     }
 
+    @ApiStatus.Internal
     public void tick() {
         if (animation != null) {
             animation.tick();
@@ -41,6 +41,7 @@ public class AnimationProcessor {
         return animation.get3DTransform(partKey, type, this.tickDelta, value0);
     }
 
+    @ApiStatus.Internal
     public void setTickDelta(float tickDelta) {
         this.tickDelta = tickDelta;
         if (animation != null) {
@@ -71,4 +72,11 @@ public class AnimationProcessor {
         return new Pair<>(bendVec.getX(), bendVec.getY());
     }
 
+    /**
+     * @return Priority of the currently active animation, returns 0 if there are none.
+     */
+    public int getPriority() {
+        if (animation instanceof AnimationStack animationStack) return animationStack.getPriority();
+        return 0;
+    }
 }

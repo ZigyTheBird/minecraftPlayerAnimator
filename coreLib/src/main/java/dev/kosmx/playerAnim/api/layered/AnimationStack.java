@@ -124,4 +124,16 @@ public class AnimationStack implements IAnimation {
         }
         return IAnimation.super.getFirstPersonConfiguration(tickDelta);
     }
+
+    public int getPriority() {
+        int priority = 0;
+        for (int i=layers.size()-1; i>=0; i--) {
+            Pair<Integer, IAnimation> layer = layers.get(i);
+            if (layer.getRight().isActive()) {
+                priority = layer.getLeft();
+                break;
+            }
+        }
+        return priority;
+    }
 }
