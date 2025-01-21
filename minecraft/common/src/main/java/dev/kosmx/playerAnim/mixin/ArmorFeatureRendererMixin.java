@@ -38,7 +38,7 @@ public abstract class ArmorFeatureRendererMixin<T extends LivingEntity, M extend
     )
     private void modifyArmorVisibility(A humanoidModel, EquipmentSlot equipmentSlot, CallbackInfo ci) {
         AnimationApplier emote = ((IAnimatedPlayer) Minecraft.getInstance().player).playerAnimator_getAnimation();
-        if (emote.isActive() && emote.getFirstPersonMode() == FirstPersonMode.THIRD_PERSON_MODEL_SP && FirstPersonMode.isFirstPersonPass()) {
+        if (emote.isActive() && emote.getFirstPersonMode() == FirstPersonMode.THIRD_PERSON_MODEL && emote.getFirstPersonConfiguration().isShowArmor() && FirstPersonMode.isFirstPersonPass()) {
             humanoidModel.setAllVisible(false);
             if (equipmentSlot == CHEST) {
                 humanoidModel.rightArm.visible = emote.getFirstPersonConfiguration().isShowRightArm();
